@@ -4,13 +4,13 @@
  * @date 创建时间：2018/1/10
  * 类说明     用于返回消息找寻原Socket 为了保证无锁使用actor
  */
-package com.linkflywind.gameserver.connector.WebSocketCache;
+package com.linkflywind.gameserver.connector.webSocketCache;
 
 import akka.actor.UntypedActor;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.PopChannel;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.PutChannel;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.RemoveChannel;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.TellPopChannel;
+import com.linkflywind.gameserver.connector.webSocketCache.message.PopChannel;
+import com.linkflywind.gameserver.connector.webSocketCache.message.PutChannel;
+import com.linkflywind.gameserver.connector.webSocketCache.message.RemoveChannel;
+import com.linkflywind.gameserver.connector.webSocketCache.message.TellPopChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.socket.WebSocketMessage;

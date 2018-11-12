@@ -1,8 +1,9 @@
 package com.linkflywind.gameserver.connector;
 
-import com.linkflywind.gameserver.connector.WebSocketCache.WebSocketCacheActorManager;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.PutChannel;
-import com.linkflywind.gameserver.connector.WebSocketCache.message.RemoveChannel;
+import com.linkflywind.gameserver.connector.redisModel.ConnectorData;
+import com.linkflywind.gameserver.connector.webSocketCache.WebSocketCacheActorManager;
+import com.linkflywind.gameserver.connector.webSocketCache.message.PutChannel;
+import com.linkflywind.gameserver.connector.webSocketCache.message.RemoveChannel;
 import com.linkflywind.gameserver.connector.config.ConnectorConfig;
 import com.linkflywind.gameserver.connector.redisModel.UserSession;
 import com.linkflywind.gameserver.security.JwtTokenUtil;
@@ -16,8 +17,8 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.UnicastProcessor;
 
-
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
@@ -27,12 +28,14 @@ public class ReactiveWebSocketHandler implements WebSocketHandler {
     private final WebSocketCacheActorManager webSocketCacheActorManager;
     private final ReactiveRedisOperations<String, UserSession> reactiveRedisOperations;
     private final ConnectorConfig connectorConfig;
+    private final ReactiveRedisOperations<String, ConnectorData> reactiveRedisOperationsByConnectorData;
 
 
-    ReactiveWebSocketHandler(WebSocketCacheActorManager webSocketCacheActorManager, ReactiveRedisOperations<String, UserSession> reactiveRedisOperations, ConnectorConfig connectorConfig) {
+    ReactiveWebSocketHandler(WebSocketCacheActorManager webSocketCacheActorManager, ReactiveRedisOperations<String, UserSession> reactiveRedisOperations, ConnectorConfig connectorConfig, ReactiveRedisOperations<String, ConnectorData> reactiveRedisOperationsByConneecctorData) {
         this.webSocketCacheActorManager = webSocketCacheActorManager;
         this.reactiveRedisOperations = reactiveRedisOperations;
         this.connectorConfig = connectorConfig;
+        this.reactiveRedisOperationsByConnectorData = reactiveRedisOperationsByConneecctorData;
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ReactiveWebSocketHandler implements WebSocketHandler {
         String token = principal.toString();
         String user = Objects.requireNonNull(headers.get("user")).get(0);
         if (JwtTokenUtil.validateToken(token, user)) {
-            return loginRedis(user, sessionId,token);
+            return loginRedis(user, sessionId, token);
         }
         return Mono.just(false);
     }
@@ -62,11 +65,12 @@ public class ReactiveWebSocketHandler implements WebSocketHandler {
                 .set(user, new UserSession(user, sessionId, token, new Date().getTime(), 0L, "0"));
     }
 
-    private Mono<Boolean> logoutRedis(HttpHeaders headers){
+    private Mono<Boolean> logoutRedis(HttpHeaders headers) {
         String user = Objects.requireNonNull(headers.get("user")).get(0);
-        return reactiveRedisOperations.opsForValue().get(user).flatMap(p->{
+
+        return reactiveRedisOperations.opsForValue().get(user).flatMap(p -> {
             p.setLastLogoutTime(new Date().getTime());
-            return reactiveRedisOperations.opsForValue().set(user,p);
+            return reactiveRedisOperations.opsForValue().set(user, p);
         });
     }
 
@@ -77,9 +81,14 @@ public class ReactiveWebSocketHandler implements WebSocketHandler {
         session.receive().doOnNext(p -> {
             byte[] array = p.getPayload().asByteBuffer().array();
             int channel = (int) array[0];
-            connectorConfig.getRoutes().get(channel);
 
+            int protocol = (array[1] << 8 & array[2]);
 
+            String name = session.getHandshakeInfo().getHeaders().get("user").get(0);
+
+            reactiveRedisOperationsByConnectorData.convertAndSend(connectorConfig.getRoutes().get(channel),
+                    new ConnectorData(name, session.getId(), protocol, Arrays.copyOfRange(array, 3, array.length - 1)))
+                    .subscribe();
         }).doFinally(sig -> {
             logger.info("Terminating WebSocket Session (client side) sig: [{}], [{}]", sig.name(), session.getId());
             session.close();

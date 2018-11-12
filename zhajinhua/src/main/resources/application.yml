@@ -7,10 +7,5 @@ spring:
     host: localhoost
     port: 8888
     password: 00
-connector:
-  routes:
-    1: zhajinhua
-    2: paodekuai
-    3: baijiale
-    4: douniu
-  name: connector1
+zhajinhua:
+  name: zhajinhua

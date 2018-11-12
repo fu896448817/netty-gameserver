@@ -10,6 +10,7 @@
         <module>connector</module>
         <module>loginserver</module>
         <module>common</module>
+        <module>zhajinhua</module>
     </modules>
     <packaging>pom</packaging>
 

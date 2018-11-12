@@ -1,4 +1,4 @@
-package com.linkflywind.gameserver.connector.WebSocketCache;
+package com.linkflywind.gameserver.connector.webSocketCache;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;

@@ -1,7 +1,8 @@
 package com.linkflywind.gameserver.connector;
 
 
-import com.linkflywind.gameserver.connector.WebSocketCache.WebSocketCacheActorManager;
+import com.linkflywind.gameserver.connector.redisModel.ConnectorData;
+import com.linkflywind.gameserver.connector.webSocketCache.WebSocketCacheActorManager;
 import com.linkflywind.gameserver.connector.config.ConnectorConfig;
 import com.linkflywind.gameserver.connector.redisModel.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +28,21 @@ public class ConnectorApplication {
 
     private final ConnectorConfig connectorConfig;
 
+    private final ReactiveRedisOperations<String, ConnectorData> reactiveRedisOperationsByConnectorData;
+
     @Autowired
-    public ConnectorApplication(WebSocketCacheActorManager webSocketCacheActorManager, ReactiveRedisOperations<String, UserSession> userSessionOps, ConnectorConfig connectorConfig) {
+    public ConnectorApplication(WebSocketCacheActorManager webSocketCacheActorManager, ReactiveRedisOperations<String, UserSession> userSessionOps, ConnectorConfig connectorConfig, ReactiveRedisOperations<String, ConnectorData> reactiveRedisOperationsByConneecctorData) {
         this.webSocketCacheActorManager = webSocketCacheActorManager;
         this.userSessionOps = userSessionOps;
         this.connectorConfig = connectorConfig;
+        this.reactiveRedisOperationsByConnectorData = reactiveRedisOperationsByConneecctorData;
     }
 
 
     @Bean
     public HandlerMapping handlerMapping() {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/connector", new ReactiveWebSocketHandler(webSocketCacheActorManager, userSessionOps, connectorConfig));
+        map.put("/connector", new ReactiveWebSocketHandler(webSocketCacheActorManager, userSessionOps, connectorConfig, reactiveRedisOperationsByConnectorData));
 
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
         mapping.setUrlMap(map);
