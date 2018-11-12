@@ -7,55 +7,36 @@
 package com.linkflywind.gameserver.loginserver.controller;
 
 import com.linkflywind.gameserver.loginserver.controller.from.LoginForm;
-import com.linkflywind.gameserver.loginserver.controller.from.LoginOutForm;
 import com.linkflywind.gameserver.loginserver.controller.from.RegisterForm;
 import com.linkflywind.gameserver.loginserver.monoModel.UserModel;
 import com.linkflywind.gameserver.loginserver.monoRepository.UserRepository;
-import com.linkflywind.gameserver.loginserver.redisModel.UserSession;
+import com.linkflywind.gameserver.security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 public class LoginController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private ReactiveRedisOperations<String, UserSession> userSessionOps;
+    public LoginController(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
+        this.userRepository = userRepository;
+        this.jwtTokenUtil = jwtTokenUtil;
+    }
 
 
     @GetMapping
     public Mono<Optional<String>> login(@RequestBody LoginForm loginForm) {
-        String token = UUID.randomUUID().toString();
-        return userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword())
-                .flatMap(p -> userSessionOps.opsForValue().set(UUID.randomUUID().toString(),
-                        new UserSession(UUID.randomUUID().toString(),
-                                loginForm.getName())).map(result -> {
-                    if (result) {
-                        return Optional.of(token);
-                    } else {
-                        return Optional.empty();
-                    }
-                }));
-    }
-
-    @GetMapping
-    public Mono<Boolean> logout(@RequestBody LoginOutForm loginOutForm) {
-        return userSessionOps.opsForValue().delete(loginOutForm.getToken());
-    }
-
-    @GetMapping
-    public Mono<Boolean> Verification(String token) {
-        return userSessionOps.hasKey(token);
+        return userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword()).map(p->
+                Optional.of( JwtTokenUtil.generateToken(p.getName())));
     }
 
     @GetMapping
@@ -66,7 +47,9 @@ public class LoginController {
                 registerForm.getMobileNumber(),
                 registerForm.getSex(),
                 0.0,
-                registerForm.getSponsor()
+                registerForm.getSponsor(),
+                "",
+                ""
                 );
         return userRepository.save(userModel).map(userModel1 -> true);
     }

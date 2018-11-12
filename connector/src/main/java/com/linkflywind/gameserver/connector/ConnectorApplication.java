@@ -1,10 +1,14 @@
 package com.linkflywind.gameserver.connector;
 
 
+import com.linkflywind.gameserver.connector.WebSocketCache.WebSocketCacheActorManager;
+import com.linkflywind.gameserver.connector.config.ConnectorConfig;
+import com.linkflywind.gameserver.connector.redisModel.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.web.reactive.HandlerMapping;
 import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -16,16 +20,32 @@ import java.util.Map;
 @SpringBootApplication
 @Configuration
 public class ConnectorApplication {
+
+    private final WebSocketCacheActorManager webSocketCacheActorManager;
+
+    private final ReactiveRedisOperations<String, UserSession> userSessionOps;
+
+    private final ConnectorConfig connectorConfig;
+
+    @Autowired
+    public ConnectorApplication(WebSocketCacheActorManager webSocketCacheActorManager, ReactiveRedisOperations<String, UserSession> userSessionOps, ConnectorConfig connectorConfig) {
+        this.webSocketCacheActorManager = webSocketCacheActorManager;
+        this.userSessionOps = userSessionOps;
+        this.connectorConfig = connectorConfig;
+    }
+
+
     @Bean
     public HandlerMapping handlerMapping() {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/path", new ReactiveWebSocketHandler());
+        map.put("/connector", new ReactiveWebSocketHandler(webSocketCacheActorManager, userSessionOps, connectorConfig));
 
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
         mapping.setUrlMap(map);
         mapping.setOrder(-1); // before annotated controllers
         return mapping;
     }
+
 
     @Bean
     public WebSocketHandlerAdapter handlerAdapter() {

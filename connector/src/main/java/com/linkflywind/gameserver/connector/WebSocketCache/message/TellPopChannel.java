@@ -1,0 +1,23 @@
+/*
+* @author   作者: qugang
+* @E-mail   邮箱: qgass@163.com
+* @date     创建时间：2018/1/22
+* 类说明     返回socket channel
+*/
+package com.linkflywind.gameserver.connector.WebSocketCache.message;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.web.reactive.socket.WebSocketMessage;
+import reactor.core.publisher.UnicastProcessor;
+
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class TellPopChannel {
+    private String webSocketSessionId;
+    private UnicastProcessor<WebSocketMessage> unicastProcessor;
+    private byte[] message;
+}

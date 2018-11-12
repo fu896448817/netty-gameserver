@@ -19,4 +19,6 @@ public class UserModel {
     private String sex;
     private double balance;
     private String sponsor;
+    private String eosAddress;
+    private String eosPrivateKey;
 }

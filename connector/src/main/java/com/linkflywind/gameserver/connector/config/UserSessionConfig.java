@@ -1,7 +1,7 @@
-package com.linkflywind.gameserver.loginserver.redisConfig;
+package com.linkflywind.gameserver.connector.config;
 
 
-import com.linkflywind.gameserver.loginserver.redisModel.UserSession;
+import com.linkflywind.gameserver.connector.redisModel.UserSession;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;

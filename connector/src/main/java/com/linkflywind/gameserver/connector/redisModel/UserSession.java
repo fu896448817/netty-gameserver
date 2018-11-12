@@ -1,4 +1,4 @@
-package com.linkflywind.gameserver.loginserver.redisModel;
+package com.linkflywind.gameserver.connector.redisModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class UserSession implements Serializable {
     @Id
-    private String token;
     private String name;
+    private String socketId;
+    private String token;
+    private Long lastLoginTime;
+    private Long lastLogoutTime;
+    //0: 登陆 1:退出
+    private String state;
+
 }
