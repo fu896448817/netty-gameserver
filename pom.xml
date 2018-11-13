@@ -7,10 +7,10 @@
     <artifactId>gameserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>connector</module>
+        <module>hall</module>
         <module>loginserver</module>
-        <module>common</module>
-        <module>zhajinhua</module>
+        <module>core</module>
+        <module>logicserver</module>
     </modules>
     <packaging>pom</packaging>
 
