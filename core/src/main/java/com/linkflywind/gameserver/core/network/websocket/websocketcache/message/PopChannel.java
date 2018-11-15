@@ -10,10 +10,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PopChannel {
     private String webSocketSessionId;
-    private byte[] message;
+    private Optional<byte[]> message;
 }

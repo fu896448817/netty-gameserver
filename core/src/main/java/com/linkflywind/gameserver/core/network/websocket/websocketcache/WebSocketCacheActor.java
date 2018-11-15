@@ -7,21 +7,16 @@
 package com.linkflywind.gameserver.core.network.websocket.websocketcache;
 
 import akka.actor.UntypedActor;
-import com.linkflywind.gameserver.core.network.websocket.websocketcache.message.PopChannel;
-import com.linkflywind.gameserver.core.network.websocket.websocketcache.message.PutChannel;
-import com.linkflywind.gameserver.core.network.websocket.websocketcache.message.RemoveChannel;
-import com.linkflywind.gameserver.core.network.websocket.websocketcache.message.TellPopChannel;
+import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
+import com.linkflywind.gameserver.core.network.websocket.websocketcache.message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import reactor.core.publisher.UnicastProcessor;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class WebSocketCacheActor extends UntypedActor {
 
-    private Map<String, UnicastProcessor<WebSocketMessage>> map = new HashMap<>();
+    private Map<String, GameWebSocketSession> map = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -31,14 +26,16 @@ public class WebSocketCacheActor extends UntypedActor {
     public void onReceive(Object message) {
         if (message instanceof PutChannel) {
             PutChannel putChannel = (PutChannel) message;
-            map.put(putChannel.getWebSocketSessionId(), putChannel.getUnicastProcessor());
+            map.put(putChannel.getWebSocketSessionId(), putChannel.getGameWebSocketSession());
         } else if (message instanceof RemoveChannel) {
             RemoveChannel removeChannel = (RemoveChannel) message;
-            UnicastProcessor<WebSocketMessage> unicastProcessor =  map.remove(removeChannel.getWebSocketSessionId());
-            unicastProcessor.dispose();
+            GameWebSocketSession gameWebSocketSession =  map.remove(removeChannel.getWebSocketSessionId());
+
+            getSender().tell(new TellRemoveChannel(gameWebSocketSession.getSessionId(),gameWebSocketSession), getSelf());
         } else if (message instanceof PopChannel) {
             PopChannel popChannel = (PopChannel) message;
-            getSender().tell(new TellPopChannel(popChannel.getWebSocketSessionId(), map.get(popChannel.getWebSocketSessionId()),
+            getSender().tell(new TellPopChannel(popChannel.getWebSocketSessionId(),
+                    map.get(popChannel.getWebSocketSessionId()),
                     popChannel.getMessage()), getSelf());
         } else {
             logger.warn("not found class type:" + message.getClass());

@@ -7,10 +7,11 @@
     <artifactId>gameserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <modules>
-        <module>hall</module>
-        <module>loginserver</module>
+        <module>hallserver</module>
+        <module>webserver</module>
         <module>core</module>
         <module>logicserver</module>
+        <module>data</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -21,7 +22,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.0.RELEASE</version>
-        <relativePath/> <!-- lookup parent from monoRepository -->
+        <relativePath/> <!-- lookup parent from com.linkflywind.gameserver.data.monoRepository -->
     </parent>
 
     <properties>
@@ -69,6 +70,12 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>0.9.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yeauty</groupId>
+                <artifactId>netty-websocket-spring-boot-starter</artifactId>
+                <version>0.7.1</version>
             </dependency>
 
         </dependencies>

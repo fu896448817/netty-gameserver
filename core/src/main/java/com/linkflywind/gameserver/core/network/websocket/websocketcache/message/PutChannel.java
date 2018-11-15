@@ -6,16 +6,15 @@
  */
 package com.linkflywind.gameserver.core.network.websocket.websocketcache.message;
 
+import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import reactor.core.publisher.UnicastProcessor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class PutChannel {
     private String webSocketSessionId;
-    private UnicastProcessor<WebSocketMessage> unicastProcessor;
+    private GameWebSocketSession gameWebSocketSession;
 }

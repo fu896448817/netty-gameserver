@@ -7,6 +7,11 @@ spring:
     host: localhoost
     port: 8888
     password: 00
-logicserver:
-  name: logicserver
-  connector: hallserver
+hall:
+  routes:
+    1: hallserver
+    2: logicserver
+    3: paodekuai
+    4: baijiale
+    5: douniu
+  name: hallserver

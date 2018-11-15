@@ -24,7 +24,7 @@ public class  JwtTokenUtil {
     private static String secret;
     private static Long expiration;
 
-    private static String getUsernameFromToken(String token) {
+    public static String getUsernameFromToken(String token) {
         String username;
         try {
             final Claims claims = getClaimsFromToken(token);

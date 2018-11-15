@@ -13,9 +13,9 @@ import java.util.Optional;
 @Component
 public class DispatcherAction {
 
-    final
+    private final
     ApplicationContext context;
-    private Map<Integer, BaseAction> actionCahce;
+    private Map<Integer, BaseAction> actionCache;
 
     @Autowired
     public DispatcherAction(ApplicationContext context) {
@@ -23,8 +23,8 @@ public class DispatcherAction {
     }
 
     public Optional<BaseAction> createAction(int protocol) {
-        if (actionCahce != null)
-            return Optional.of(actionCahce.get(protocol));
+        if (actionCache != null)
+            return Optional.of(actionCache.get(protocol));
         return Optional.empty();
     }
 
@@ -33,7 +33,7 @@ public class DispatcherAction {
         for (String bean : context.getBeanNamesForAnnotation(Protocol.class)) {
             Object o = context.getBean(bean);
             Protocol protocol = (Protocol) o.getClass().getAnnotations()[0];
-            actionCahce.put(protocol.value(), (BaseAction) o);
+            actionCache.put(protocol.value(), (BaseAction) o);
         }
     }
 }
