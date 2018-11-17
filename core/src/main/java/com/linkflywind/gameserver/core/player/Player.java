@@ -1,17 +1,12 @@
 package com.linkflywind.gameserver.core.player;
 
+import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class Player {
-    private String name;
-    private String nickName;
-    private String sex;
-    private String headPortrait;
-
-
+    private GameWebSocketSession gameWebSocketSession;
+    private int score;
 }

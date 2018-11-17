@@ -11,13 +11,13 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 
 public abstract class BaseAction {
 
     @Value("${logicserver.hallserver}")
-    private String connectorName;
+    protected String connectorName;
+
 
 
     protected final   RedisTemplate redisTemplate;
@@ -48,6 +48,12 @@ public abstract class BaseAction {
     protected byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsBytes(o);
+    }
+
+    protected void send(Object o,TransferData transferData,String connector) throws JsonProcessingException {
+        byte[] data = packJson(o);
+        transferData.setData(java.util.Optional.ofNullable(data));
+        this.redisTemplate.convertAndSend(connector, transferData);
     }
 
 //    protected Mono<Long> sendTransferData(TransferData transferData) {

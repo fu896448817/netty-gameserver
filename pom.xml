@@ -12,6 +12,8 @@
         <module>core</module>
         <module>logicserver</module>
         <module>data</module>
+        <module>GameAlgorithm</module>
+        <module>cardlib</module>
     </modules>
     <packaging>pom</packaging>
 
