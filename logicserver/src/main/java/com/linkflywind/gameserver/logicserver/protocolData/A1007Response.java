@@ -1,6 +1,6 @@
 package com.linkflywind.gameserver.logicserver.protocolData;
 
-
+import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class A1003Request {
-    private int playerLowerlimit;
-    private int playerUpLimit;
-    private  int xiaZhuTop;
-    private int juShu;
+public class A1007Response {
+    YingSanZhangPlayer player;
+    String type;
+    int chouMa;
 }

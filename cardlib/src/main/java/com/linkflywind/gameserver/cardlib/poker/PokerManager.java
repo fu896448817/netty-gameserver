@@ -17,7 +17,7 @@ public class PokerManager {
         }
     }
 
-    private void shuffle() {
+    public void shuffle() {
         Collections.shuffle(pokers);
     }
 

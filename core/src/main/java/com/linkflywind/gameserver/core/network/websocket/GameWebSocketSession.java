@@ -1,6 +1,7 @@
 package com.linkflywind.gameserver.core.network.websocket;
 
 
+import io.netty.channel.ChannelId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Optional;
 public class GameWebSocketSession implements Serializable {
     @Id
     private String name;
-    private String sessionId;
+    private ChannelId sessionId;
     private String token;
     private String lastLoginTime;
     private String lastLogoutTime;
@@ -24,5 +25,5 @@ public class GameWebSocketSession implements Serializable {
     private String state;
     private String address;
     private Optional<String> channel;
-    private transient Session session;
+    private Optional<String> roomNumber;
 }

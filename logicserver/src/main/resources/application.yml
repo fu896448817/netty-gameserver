@@ -8,5 +8,5 @@ spring:
     port: 8888
     password: 00
 logicserver:
-  name: logicserver
+  name: yingsanzhang
   connector: hallserver

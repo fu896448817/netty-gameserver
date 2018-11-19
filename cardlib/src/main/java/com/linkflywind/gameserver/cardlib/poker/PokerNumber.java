@@ -1,6 +1,7 @@
 package com.linkflywind.gameserver.cardlib.poker;
 
 public enum PokerNumber {
+    two,
     three,
     Four,
     Five,
@@ -12,5 +13,4 @@ public enum PokerNumber {
     Q,
     K,
     A,
-    two,
 }

@@ -21,4 +21,5 @@ public class UserModel {
     private String sponsor;
     private String eosAddress;
     private String eosPrivateKey;
+    private int cardNumber;
 }

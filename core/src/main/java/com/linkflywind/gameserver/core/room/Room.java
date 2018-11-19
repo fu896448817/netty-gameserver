@@ -4,17 +4,20 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.redisModel.TransferData;
+import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public abstract class Room {
+@Data
+public abstract class Room<T> {
     private String roomNumber;
     private int playerUpLimit;
     private int playerLowerlimit;
     private Player yingSanZhangPoker;
     private RedisTemplate redisTemplate;
+    private T master;
 
 
     public Room(String roomNumber, int playerLowerlimit, int playerUpLimit, RedisTemplate redisTemplate) {
@@ -22,63 +25,37 @@ public abstract class Room {
         this.playerLowerlimit = playerLowerlimit;
         this.playerUpLimit = playerUpLimit;
         this.redisTemplate = redisTemplate;
+        this.playerList = new ConcurrentLinkedQueue<>();
     }
 
+    protected ConcurrentLinkedQueue<T> playerList;
 
-    public int getPlayerUpLimit() {
-        return playerUpLimit;
-    }
-
-    public void setPlayerUpLimit(int playerUpLimit) {
-        this.playerUpLimit = playerUpLimit;
-    }
-
-    public int getPlayerLowerlimit() {
-        return playerLowerlimit;
-    }
-
-    public void setPlayerLowerlimit(int playerLowerlimit) {
-        this.playerLowerlimit = playerLowerlimit;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    protected List<Player> playerList;
-
-    public List< Player> getPlayerList() {
-        return playerList;
-    }
-
-    public void setPlayerList(List<Player> playerList) {
-        this.playerList = playerList;
-    }
-
-    public void create(Player player) {
+    public void create(T player) {
         playerList.add(player);
     }
 
-    public void join(Player player) {
+    public void join(T player) {
         playerList.add(player);
         if (this.playerList.size() == this.playerLowerlimit) {
             beginGame();
         }
     }
 
-    public void exit(Player player) {
-        playerList.removeIf(player1 -> ((Player)player1).getGameWebSocketSession().getName().equals(player.getGameWebSocketSession().getName()));
-    }
-
-    public void exit(String name) {
-        playerList.removeIf(player1 -> ((Player)player1).getGameWebSocketSession().getName().equals(name));
+    public void exit(T player) {
+        playerList.remove(player);
     }
 
     public abstract void beginGame();
+
+    public abstract void ready(String name);
+
+    public abstract T getPlayer(String name);
+
+    public abstract void exit(String name);
+
+    public abstract void disConnection(String name);
+
+    public abstract void reConnection(String name);
 
     protected byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -90,5 +67,6 @@ public abstract class Room {
         transferData.setData(java.util.Optional.ofNullable(data));
         this.redisTemplate.convertAndSend(connector, transferData);
     }
+
 }
 

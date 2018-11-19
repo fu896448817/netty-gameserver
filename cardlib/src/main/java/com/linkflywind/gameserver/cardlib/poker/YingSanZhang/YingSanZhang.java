@@ -16,36 +16,46 @@ public class YingSanZhang implements Comparable<YingSanZhang> {
         cards.sort(Comparator.comparing(Poker::getNumber));
     }
 
-    private YingSanZhangType isTongHua() {
-        if (cards.get(0).getCardType() == cards.get(1).getCardType() && cards.get(1).getCardType() == cards.get(2).getCardType())
-            return YingSanZhangType.tonghua;
-        return YingSanZhangType.None;
+    private boolean isTonghua() {
+        if (cards.get(0).getCardType().equals(cards.get(1).getCardType()) &&
+                cards.get(1).getCardType().equals(cards.get(2).getCardType()))
+            return true;
+        return false;
     }
 
-    private YingSanZhangType isShun() {
-        if (cards.get(2).getNumber().ordinal() - cards.get(1).getCardType().ordinal() == 1 &&
-                cards.get(1).getCardType().ordinal() - cards.get(0).getCardType().ordinal() == 1)
-            return YingSanZhangType.shun;
-        return YingSanZhangType.None;
+    private boolean isShun() {
+        if ((cards.get(2).getNumber().ordinal() - cards.get(1).getCardType().ordinal() == 1 ||
+                cards.get(2).getNumber().ordinal() - cards.get(1).getCardType().ordinal() == 10)
+                &&
+                (cards.get(1).getCardType().ordinal() - cards.get(0).getCardType().ordinal() == 1))
+            return true;
+        return false;
+    }
+
+    private boolean isSanZhang() {
+        if (cards.get(0).getNumber().equals(cards.get(1).getNumber()) &&
+                cards.get(1).getNumber().equals(cards.get(2).getNumber()))
+            return true;
+        return false;
+    }
+
+    private boolean isDui() {
+        if (cards.get(0).getNumber().ordinal() == cards.get(1).getNumber().ordinal() ||
+                cards.get(1).getNumber().ordinal() == cards.get(2).getNumber().ordinal())
+            return true;
+        return false;
     }
 
     private YingSanZhangType getYingSanZhangType() {
-        if (cards.get(2).getNumber().equals(cards.get(1).getCardType()) &&
-                cards.get(1).getNumber().equals(cards.get(1).getNumber()))
+        if (isSanZhang())
             return YingSanZhangType.Sanzhang;
-        if (cards.get(0).getCardType() == cards.get(1).getCardType() &&
-                cards.get(1).getCardType() == cards.get(2).getCardType() &&
-                cards.get(2).getNumber().ordinal() - cards.get(1).getCardType().ordinal() == 1 &&
-                cards.get(1).getCardType().ordinal() - cards.get(0).getCardType().ordinal() == 1
-        )
+        if (isTonghua() && isShun())
             return YingSanZhangType.tonghuaShun;
-        if (cards.get(2).getNumber().ordinal() - cards.get(1).getCardType().ordinal() == 1 &&
-                cards.get(1).getCardType().ordinal() - cards.get(0).getCardType().ordinal() == 1)
+        if (isShun())
             return YingSanZhangType.shun;
-        if (cards.get(0).getCardType() == cards.get(1).getCardType() && cards.get(1).getCardType() == cards.get(2).getCardType())
+        if (isTonghua())
             return YingSanZhangType.tonghua;
-        if (cards.get(0).getNumber().ordinal() == cards.get(1).getNumber().ordinal() ||
-                cards.get(1).getNumber().ordinal() == cards.get(2).getNumber().ordinal())
+        if (isDui())
             return YingSanZhangType.dui;
         return YingSanZhangType.None;
     }
@@ -94,9 +104,9 @@ public class YingSanZhang implements Comparable<YingSanZhang> {
     }
 
     private int compareShun(YingSanZhang o) {
-        if (this.cards.get(2).getNumber().ordinal() == o.cards.get(2).getNumber().ordinal())
+        if (this.cards.get(0).getNumber().ordinal() == o.cards.get(0).getNumber().ordinal())
             return 0;
-        else if (this.cards.get(2).getNumber().ordinal() > o.cards.get(2).getNumber().ordinal())
+        else if (this.cards.get(0).getNumber().ordinal() > o.cards.get(0).getNumber().ordinal())
             return 1;
         else
             return -1;

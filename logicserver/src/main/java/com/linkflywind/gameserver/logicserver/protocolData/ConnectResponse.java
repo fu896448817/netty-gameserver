@@ -8,9 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class A1003Request {
-    private int playerLowerlimit;
-    private int playerUpLimit;
-    private  int xiaZhuTop;
-    private int juShu;
+public class ConnectResponse {
+    String name;
 }

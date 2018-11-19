@@ -3,36 +3,20 @@ package com.linkflywind.gameserver.logicserver.player;
 import com.linkflywind.gameserver.cardlib.poker.YingSanZhang.YingSanZhang;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.player.Player;
+import lombok.Data;
 
-public class YingSanZhangPlayer extends Player {
-
+@Data
+public class YingSanZhangPlayer extends Player implements Comparable<YingSanZhangPlayer> {
 
     private YingSanZhang yingSanZhang;
-
-
-    private boolean isWin;
-
-    public boolean isWin() {
-        return isWin;
-    }
-
-    public void setWin(boolean win) {
-        isWin = win;
-    }
-
-    private boolean isOp;
-
-    public boolean isOp() {
-        return isOp;
-    }
-
-    public void setOp(boolean op) {
-        isOp = op;
-    }
+    private YingSanZhangPlayerState state;
 
     public YingSanZhangPlayer(GameWebSocketSession gameWebSocketSession,
-                              int score) {
-        super(gameWebSocketSession, score);
+                              int score,
+                              Boolean isReady) {
+        super(gameWebSocketSession, score,isReady);
+        this.setState(YingSanZhangPlayerState.none);
+        this.setReady(true);
     }
 
     public YingSanZhang getYingSanZhang() {
@@ -41,5 +25,11 @@ public class YingSanZhangPlayer extends Player {
 
     public void setYingSanZhang(YingSanZhang yingSanZhang) {
         this.yingSanZhang = yingSanZhang;
+    }
+
+
+    @Override
+    public int compareTo(YingSanZhangPlayer o) {
+        return this.getYingSanZhang().compareTo(o.getYingSanZhang());
     }
 }

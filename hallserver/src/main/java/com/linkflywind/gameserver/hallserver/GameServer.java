@@ -4,7 +4,6 @@ package com.linkflywind.gameserver.hallserver;
 import com.linkflywind.gameserver.core.action.DispatcherAction;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocket;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
-import com.linkflywind.gameserver.core.network.websocket.websocketcache.WebSocketCacheActorManager;
 import com.linkflywind.gameserver.core.redisModel.TransferData;
 import com.linkflywind.gameserver.hallserver.config.HallConfig;
 import org.slf4j.Logger;
@@ -30,8 +29,8 @@ public class GameServer extends GameWebSocket {
     private final RedisTemplate redisTemplate;
 
     @Autowired
-    public GameServer(WebSocketCacheActorManager webSocketCacheActorManager, DispatcherAction dispatcherAction, HallConfig hallConfig, RedisTemplate redisTemplate) {
-        super(webSocketCacheActorManager);
+    public GameServer(DispatcherAction dispatcherAction, HallConfig hallConfig, RedisTemplate redisTemplate) {
+        super(redisTemplate);
         this.dispatcherAction = dispatcherAction;
         this.hallConfig = hallConfig;
         this.redisTemplate = redisTemplate;
@@ -39,37 +38,27 @@ public class GameServer extends GameWebSocket {
 
     @Override
     protected boolean receiveHandle(GameWebSocketSession session, int channel, int protocol, Optional<byte[]> buffer) {
+
         String channelString = hallConfig.getRoutes().get(String.valueOf(channel));
-        if(channelString.equals(hallConfig.getName())){
+        if (channelString.equals(hallConfig.getName())) {
             dispatcherAction.createAction(protocol);
-        }
-        else
-        {
-            this.redisTemplate.convertAndSend(channelString,new TransferData(session,channelString,protocol,buffer));
+        } else {
+            this.redisTemplate.convertAndSend(channelString, new TransferData(session, channelString, protocol, buffer));
         }
         return true;
     }
 
     @Override
     protected void openHandle(GameWebSocketSession session) {
-        dispatcherAction.createAction(1001).ifPresent(p-> {
-            try {
-                p.action(new TransferData(session,"",1001,Optional.empty()));
-            } catch (IOException e) {
-                logger.error("action error ",e);
-            }
-        });
+        session.getChannel().ifPresent(p ->
+                this.redisTemplate.convertAndSend(p, new TransferData(session, "", 1001, Optional.empty()))
+        );
     }
 
     @Override
-    protected boolean closeHandle(GameWebSocketSession session) {
-        dispatcherAction.createAction(1002).ifPresent(p-> {
-            try {
-                p.action(new TransferData(session,"",1002,Optional.empty()));
-            } catch (IOException e) {
-                logger.error("action error ",e);
-            }
-        });
-        return true;
+    protected void closeHandle(GameWebSocketSession session) {
+        session.getChannel().ifPresent(p ->
+                this.redisTemplate.convertAndSend(p, new TransferData(session, "", 1002, Optional.empty()))
+        );
     }
 }

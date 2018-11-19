@@ -24,23 +24,43 @@ public class LoginController {
 
     private final UserRepository userRepository;
 
-    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    public LoginController(UserRepository userRepository, JwtTokenUtil jwtTokenUtil) {
+    public LoginController(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.jwtTokenUtil = jwtTokenUtil;
     }
 
 
     @GetMapping
-    public Mono<Optional<String>> login(@RequestBody LoginForm loginForm) {
-        return userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword()).map(p->
-                Optional.of( JwtTokenUtil.generateToken(p.getName())));
+    public Optional<String> login(@RequestBody LoginForm loginForm) {
+
+        UserModel userModel =userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword());
+
+        if(userModel != null)
+        {
+            return Optional.of(JwtTokenUtil.generateToken(userModel.getName()));
+        }
+        return Optional.empty();
     }
 
     @GetMapping
-    public Mono<Boolean> register(@RequestBody RegisterForm registerForm){
+    public Optional<String> visitor(String deviceId){
+        UserModel userModel = new UserModel(deviceId,
+                "",
+                "",
+                "",
+                0.0,
+                "",
+                "",
+                "",
+                1
+        );
+        userRepository.save(userModel);
+        return Optional.of(JwtTokenUtil.generateToken(userModel.getName()));
+    }
+
+    @GetMapping
+    public UserModel register(@RequestBody RegisterForm registerForm){
         //todo 验证码
         UserModel userModel = new UserModel(registerForm.getName(),
                 registerForm.getPassword(),
@@ -49,14 +69,10 @@ public class LoginController {
                 0.0,
                 registerForm.getSponsor(),
                 "",
-                ""
+                "",
+                3
                 );
-        return userRepository.save(userModel).map(userModel1 -> true);
+        userRepository.save(userModel);
+        return userModel;
     }
-
-    @GetMapping
-    public Mono<Boolean> findByName(String name){
-        return userRepository.findById(name).map(userModel -> true);
-    }
-
 }

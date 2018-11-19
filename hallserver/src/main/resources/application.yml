@@ -10,7 +10,7 @@ spring:
 hall:
   routes:
     1: hallserver
-    2: logicserver
+    2: yingsanzhang
     3: paodekuai
     4: baijiale
     5: douniu

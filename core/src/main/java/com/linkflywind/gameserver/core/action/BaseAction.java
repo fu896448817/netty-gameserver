@@ -18,6 +18,9 @@ public abstract class BaseAction {
     @Value("${logicserver.hallserver}")
     protected String connectorName;
 
+    @Value("${logicserver.name}")
+    protected String serverName;
+
 
 
     protected final   RedisTemplate redisTemplate;
