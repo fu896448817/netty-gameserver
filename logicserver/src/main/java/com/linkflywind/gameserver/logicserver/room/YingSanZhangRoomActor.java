@@ -33,21 +33,15 @@ public class YingSanZhangRoomActor extends AbstractActor {
 
         context().stop(getSelf());
 
-        return receiveBuilder().match(BiPaiMessage.class,biPaiMessage -> {
-            yingSanZhangRoom.biPai(biPaiMessage.getName());
-        }).match(XiaZhuMessage.class,xiaZhuMessage -> {
-            yingSanZhangRoom.xiazhu(xiaZhuMessage.getChouma(),xiaZhuMessage.getType());
-        }).match(ReadyMessage.class,readyMessage -> {
-            yingSanZhangRoom.ready(readyMessage.getName());
-        }).match(ConnectionMessage.class,connectionMessage -> {
-            yingSanZhangRoom.reConnection(connectionMessage.getName());
-        }).match(CloseMessage.class,closeMessage -> {
-            yingSanZhangRoom.disConnection(closeMessage.getName());
-        }).match(CreateMessage.class,createMessage -> {
-            yingSanZhangRoom.create(createMessage.getPlayer());
-        }).match(AppendMessage.class,appendMessage -> {
+        return receiveBuilder().match(BiPaiMessage.class,biPaiMessage -> yingSanZhangRoom.biPai(biPaiMessage.getName()))
+                .match(XiaZhuMessage.class, xiaZhuMessage -> yingSanZhangRoom.xiazhu(xiaZhuMessage.getChouma(),xiaZhuMessage.getType()))
+                .match(ReadyMessage.class, readyMessage -> yingSanZhangRoom.ready(readyMessage.getName()))
+                .match(ConnectionMessage.class, connectionMessage -> yingSanZhangRoom.reConnection(connectionMessage.getName()))
+                .match(CloseMessage.class, closeMessage -> yingSanZhangRoom.disConnection(closeMessage.getName()))
+                .match(CreateMessage.class, createMessage -> yingSanZhangRoom.create(createMessage.getPlayer()))
+                .match(AppendMessage.class, appendMessage -> {
             boolean result = yingSanZhangRoom.join(appendMessage.getYingSanZhangPlayer());
             getSender().tell(new ResultMessage(result),getSelf());
-        }).build();
+        }).match(DisbandedMessage.class,disbandedMessage -> yingSanZhangRoom.disbanded(disbandedMessage.getName())).build();
     }
 }

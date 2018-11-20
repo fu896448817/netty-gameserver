@@ -3,8 +3,6 @@ package com.linkflywind.gameserver.logicserver.room;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkflywind.gameserver.cardlib.poker.YingSanZhang.YingSanZhangPoker;
-import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
-import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.redisModel.TransferData;
 import com.linkflywind.gameserver.core.room.Room;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
@@ -25,7 +23,7 @@ public class YingSanZhangRoom extends Room {
     private YingSanZhangRoomActorManager roomManager;
     private String serverName;
 
-    private final ValueOperations<String, GameWebSocketSession> valueOperationsByPlayer;
+    private final ValueOperations valueOperationsByPlayer;
 
     /**
      * 创建房间
@@ -37,15 +35,15 @@ public class YingSanZhangRoom extends Room {
      * @param juShu                   局数
      * @param yingSanZhangRoomManager 房间管理
      */
-    public YingSanZhangRoom(String roomNumber,
-                            int playerLowerlimit,
-                            int playerUpLimit,
-                            RedisTemplate redisTemplate,
-                            String connectorName,
-                            int xiaZhuTop,
-                            int juShu,
-                            String serverName,
-                            YingSanZhangRoomActorManager yingSanZhangRoomManager) {
+    YingSanZhangRoom(String roomNumber,
+                     int playerLowerlimit,
+                     int playerUpLimit,
+                     RedisTemplate redisTemplate,
+                     String connectorName,
+                     int xiaZhuTop,
+                     int juShu,
+                     String serverName,
+                     YingSanZhangRoomActorManager yingSanZhangRoomManager) {
         super(roomNumber, playerLowerlimit, playerUpLimit, redisTemplate);
         this.connectorName = connectorName;
         this.yingSanZhangPoker = new YingSanZhangPoker();
@@ -61,20 +59,30 @@ public class YingSanZhangRoom extends Room {
         for (Object player : this.playerList) {
             ((YingSanZhangPlayer) player).setYingSanZhang(yingSanZhangPoker.getPocker());
         }
-        YingSanZhangPlayer cuuentPlayer = ((YingSanZhangPlayer) this.playerList.peek());
+        YingSanZhangPlayer cuuentPlayer = ((YingSanZhangPlayer) this.playerList.element());
         cuuentPlayer.setOp(true);
-        this.playerList.toArray(new YingSanZhangPlayer[this.playerList.size()]);
-        sendAll(new A1005Response(this.playerList.toArray(new YingSanZhangPlayer[this.playerList.size()]), cuuentPlayer), 1005);
+        this.playerList.toArray(new YingSanZhangPlayer[0]);
+        sendAll(new A1005Response(this.playerList.toArray(new YingSanZhangPlayer[0]), cuuentPlayer), 1005);
         this.currentJuShuu++;
     }
 
 
-    public Boolean join(YingSanZhangPlayer player){
+    Boolean join(YingSanZhangPlayer player) {
         Boolean result = super.join(player);
-        if(result) {
-            sendAll(new A1004Response(this.playerList.toArray(new YingSanZhangPlayer[this.playerList.size()]), this.getRoomNumber()), 1004);
+        if (result) {
+            sendAll(new A1004Response(this.playerList.toArray(new YingSanZhangPlayer[0]), this.getRoomNumber()), 1004);
         }
         return result;
+    }
+
+    public Optional<Object> disbanded(String name) {
+        Optional<Object> player = super.disbanded(name);
+
+        player.ifPresent(p -> {
+            YingSanZhangPlayer yingSanZhangPlayer = (YingSanZhangPlayer) p;
+            sendAll(new A1012Response(name, this.getRoomNumber()), 1012);
+        });
+        return player;
     }
 
     @Override
@@ -88,7 +96,7 @@ public class YingSanZhangRoom extends Room {
                 }
         );
 
-        if (!this.playerList.stream().filter(p -> !((YingSanZhangPlayer) p).isReady()).findFirst().isPresent()) {
+        if (!this.playerList.stream().anyMatch(p -> !((YingSanZhangPlayer) p).isReady())) {
             reLoadGame();
         }
 
@@ -103,7 +111,7 @@ public class YingSanZhangRoom extends Room {
         optionalObject.ifPresent(p -> {
             YingSanZhangPlayer currentPlayer = (YingSanZhangPlayer) p;
             try {
-                send(new A1011Response(this.zhuoMain, this.playerList.toArray(new YingSanZhangPlayer[this.playerList.size()])),
+                send(new A1011Response(this.zhuoMain, this.playerList.toArray(new YingSanZhangPlayer[0])),
                         new TransferData(currentPlayer.getGameWebSocketSession(),
                                 this.serverName, 1011, Optional.empty()), connectorName);
             } catch (JsonProcessingException e) {
@@ -126,7 +134,7 @@ public class YingSanZhangRoom extends Room {
         return optionalObject;
     }
 
-    public void next() {
+    private void next() {
         if (checkResult()) {
             return;
         }
@@ -142,7 +150,7 @@ public class YingSanZhangRoom extends Room {
         }
     }
 
-    public void xiazhu(int chouma, String type) {
+    void xiazhu(int chouma, String type) {
         if (chouma <= xiaZhuTop) {
             zhuoMain += chouma;
             YingSanZhangPlayer player = (YingSanZhangPlayer) this.playerList.element();
@@ -152,13 +160,13 @@ public class YingSanZhangRoom extends Room {
         next();
     }
 
-    public void biPai(String name) {
+    void biPai(String name) {
         YingSanZhangPlayer yingSanZhangPlayer = (YingSanZhangPlayer) this.playerList.element();
         Optional<Object> optionalPlayer = getPlayer(name);
         optionalPlayer.ifPresent(p -> {
             YingSanZhangPlayer player = (YingSanZhangPlayer) p;
             int result = yingSanZhangPlayer.compareTo(player);
-            if (result > 1) {
+            if (result > 0) {
                 player.setState(YingSanZhangPlayerState.shu);
                 sendAll(new A1008Response(yingSanZhangPlayer, player), 1008);
             } else if (result < 1) {
@@ -170,7 +178,7 @@ public class YingSanZhangRoom extends Room {
         });
     }
 
-    public boolean checkResult() {
+    private boolean checkResult() {
 
         long count = this.playerList.stream().filter(p -> ((YingSanZhangPlayer) p).getState() == YingSanZhangPlayerState.none).count();
         if (count == 1) {
@@ -182,7 +190,7 @@ public class YingSanZhangRoom extends Room {
         return false;
     }
 
-    public void reLoadGame() {
+    private void reLoadGame() {
         if (this.currentJuShuu >= this.juShu) {
             sendAll(new A1010Response(this.getRoomNumber()), 1010);
         }
@@ -198,7 +206,7 @@ public class YingSanZhangRoom extends Room {
         }
         yingSanZhangPlayer.setOp(true);
         sendAll(new A1005Response(
-                this.playerList.toArray(new YingSanZhangPlayer[this.playerList.size()])
+                this.playerList.toArray(new YingSanZhangPlayer[0])
                 , yingSanZhangPlayer), 1005);
 
         this.currentJuShuu++;

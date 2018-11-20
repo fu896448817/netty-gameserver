@@ -18,6 +18,7 @@ public abstract class Room {
     private Player yingSanZhangPoker;
     private RedisTemplate redisTemplate;
     private Player master;
+    private boolean isDisbanded;
 
 
     public Room(String roomNumber, int playerLowerlimit, int playerUpLimit, RedisTemplate redisTemplate) {
@@ -34,8 +35,8 @@ public abstract class Room {
         playerList.add(player);
     }
 
-    public boolean join(Player player) {
-        if(this.playerList.size() <= playerUpLimit) {
+    protected boolean join(Player player) {
+        if (this.playerList.size() <= playerUpLimit) {
             playerList.add(player);
             if (this.playerList.size() == this.playerLowerlimit) {
                 beginGame();
@@ -57,37 +58,37 @@ public abstract class Room {
 
     public Optional<Object> ready(String name) {
         Optional<Object> player = this.getPlayer(name);
-        this.getPlayer(name).ifPresent(p -> {
-            ((Player) p).setReady(true);
-        });
+        player.ifPresent(p -> ((Player) p).setReady(true));
         return player;
     }
 
-    public Optional<Object> getPlayer(String name) {
+    public Optional<Object>  disbanded(String name) {
+        Optional<Object> player = this.getPlayer(name);
+        player.ifPresent(p -> ((Player) p).setDisConnection(true));
+        return player;
+    }
+
+    protected Optional<Object> getPlayer(String name) {
         for (Object player : this.playerList) {
             if (((Player) player).getName().equals(name))
-                return Optional.ofNullable(player);
+                return Optional.of(player);
         }
         return Optional.empty();
     }
 
     public Optional<Object> disConnection(String name) {
         Optional<Object> player = this.getPlayer(name);
-        this.getPlayer(name).ifPresent(p -> {
-            ((Player) p).setDisConnection(true);
-        });
+        this.getPlayer(name).ifPresent(p -> ((Player) p).setDisConnection(true));
         return player;
     }
 
     public Optional<Object> reConnection(String name) {
         Optional<Object> player = this.getPlayer(name);
-        this.getPlayer(name).ifPresent(p -> {
-            ((Player) p).setDisConnection(false);
-        });
+        this.getPlayer(name).ifPresent(p -> ((Player) p).setDisConnection(false));
         return player;
     }
 
-    protected byte[] packJson(Object o) throws JsonProcessingException {
+    private byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsBytes(o);
     }
