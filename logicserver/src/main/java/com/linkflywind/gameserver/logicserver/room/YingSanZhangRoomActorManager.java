@@ -1,6 +1,10 @@
 package com.linkflywind.gameserver.logicserver.room;
 
 
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.routing.RoundRobinPool;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.redisTool.RedisTool;
 import com.linkflywind.gameserver.data.monoModel.UserModel;
@@ -21,12 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class YingSanZhangRoomManager {
+public class YingSanZhangRoomActorManager {
 
     private String name;
     private int littleChip;
     private int intoChip;
-    ConcurrentHashMap<String, YingSanZhangRoom> map = new ConcurrentHashMap<>();
+    ConcurrentHashMap<String, ActorRef> map = new ConcurrentHashMap<>();
 
 
     @Value("${logicserver.hallserver}")
@@ -41,19 +45,23 @@ public class YingSanZhangRoomManager {
     @Autowired
     private UserRepository userRepository;
 
-    public YingSanZhangRoomManager(RedisTemplate redisTemplate) {
+    @Autowired
+    private ActorSystem actorSystem;
+
+    public YingSanZhangRoomActorManager(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
 
-    public YingSanZhangRoom createRoom(YingSanZhangPlayer player,
+    public String createRoomActor(YingSanZhangPlayer player,
                                        int playerLowerlimit,
                                        int playerUpLimit,
                                        RedisTemplate redisTemplate,
                                        int xiaZhuTop,
                                        int juShu) {
         String roomNumber = RedisTool.inc(this.redisTemplate, "room", -1);
-        YingSanZhangRoom room = new YingSanZhangRoom(roomNumber,
+        ActorRef actorRef = actorSystem.actorOf(new RoundRobinPool(1).props(Props.create(YingSanZhangRoomActor.class,
+                roomNumber,
                 playerUpLimit,
                 playerLowerlimit,
                 redisTemplate,
@@ -61,31 +69,18 @@ public class YingSanZhangRoomManager {
                 xiaZhuTop,
                 juShu,
                 this.serverName,
-                this);
-        room.create(player);
-        map.put(roomNumber, room);
-        return room;
+                this
+                )));
+        map.put(roomNumber, actorRef);
+        return roomNumber;
     }
 
-    public Optional<YingSanZhangRoom> appendRoom(String roomId, YingSanZhangPlayer player) {
-        YingSanZhangRoom room = map.get(roomId);
-
-        if(room.getPlayerUpLimit() < room.getPlayerList().size()) {
-            room.join(player);
-            return Optional.ofNullable(room);
-        }
-        return Optional.empty();
+    public ActorRef getRoomActorRef(String roomId){
+        return map.get(roomId);
     }
 
-    public YingSanZhangRoom getRoom(String roomId){
-        return  map.get(roomId);
-    }
-
-    public void exitRoom(String roomId, GameWebSocketSession player) {
-        map.get(roomId).exit(player.getName());
-    }
-
-    public void clerRoom(String roomId){
-        map.remove(roomId);
+    public void clearRoom(String roomId){
+       ActorRef actorRef =  map.remove(roomId);
+       actorSystem.stop(actorRef);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,6 +34,11 @@ public class RedisListen implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] bytes) {
+        doMessageTask(message,bytes);
+    }
+
+    @Async
+    public void doMessageTask(Message message, byte[] bytes){
         TransferData transferData = (TransferData) this.redisTemplate.getDefaultSerializer().deserialize(message.getBody());
         dispatcherAction.createAction(transferData.getProtocol()).ifPresent(p-> {
             try {
@@ -41,6 +47,5 @@ public class RedisListen implements MessageListener {
                 logger.error("action error",e);
             }
         });
-
     }
 }

@@ -8,16 +8,16 @@ import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.LinkedList;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Optional;
 
 @Data
-public abstract class Room<T> {
+public abstract class Room {
     private String roomNumber;
     private int playerUpLimit;
     private int playerLowerlimit;
     private Player yingSanZhangPoker;
     private RedisTemplate redisTemplate;
-    private T master;
+    private Player master;
 
 
     public Room(String roomNumber, int playerLowerlimit, int playerUpLimit, RedisTemplate redisTemplate) {
@@ -25,37 +25,67 @@ public abstract class Room<T> {
         this.playerLowerlimit = playerLowerlimit;
         this.playerUpLimit = playerUpLimit;
         this.redisTemplate = redisTemplate;
-        this.playerList = new ConcurrentLinkedQueue<>();
+        this.playerList = new LinkedList<>();
     }
 
-    protected ConcurrentLinkedQueue<T> playerList;
+    protected LinkedList<? super Player> playerList;
 
-    public void create(T player) {
+    public void create(Player player) {
         playerList.add(player);
     }
 
-    public void join(T player) {
-        playerList.add(player);
-        if (this.playerList.size() == this.playerLowerlimit) {
-            beginGame();
+    public boolean join(Player player) {
+        if(this.playerList.size() <= playerUpLimit) {
+            playerList.add(player);
+            if (this.playerList.size() == this.playerLowerlimit) {
+                beginGame();
+            }
+            return true;
         }
+        return false;
     }
 
-    public void exit(T player) {
+    public void exit(Player player) {
         playerList.remove(player);
+    }
+
+    public void exit(String name) {
+        playerList.removeIf(p -> ((Player) p).getName().equals(name));
     }
 
     public abstract void beginGame();
 
-    public abstract void ready(String name);
+    public Optional<Object> ready(String name) {
+        Optional<Object> player = this.getPlayer(name);
+        this.getPlayer(name).ifPresent(p -> {
+            ((Player) p).setReady(true);
+        });
+        return player;
+    }
 
-    public abstract T getPlayer(String name);
+    public Optional<Object> getPlayer(String name) {
+        for (Object player : this.playerList) {
+            if (((Player) player).getName().equals(name))
+                return Optional.ofNullable(player);
+        }
+        return Optional.empty();
+    }
 
-    public abstract void exit(String name);
+    public Optional<Object> disConnection(String name) {
+        Optional<Object> player = this.getPlayer(name);
+        this.getPlayer(name).ifPresent(p -> {
+            ((Player) p).setDisConnection(true);
+        });
+        return player;
+    }
 
-    public abstract void disConnection(String name);
-
-    public abstract void reConnection(String name);
+    public Optional<Object> reConnection(String name) {
+        Optional<Object> player = this.getPlayer(name);
+        this.getPlayer(name).ifPresent(p -> {
+            ((Player) p).setDisConnection(false);
+        });
+        return player;
+    }
 
     protected byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();

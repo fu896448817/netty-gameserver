@@ -5,7 +5,8 @@ import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 
 import java.util.concurrent.TimeUnit;
 
-public class RedisTool {
+public class
+RedisTool {
 
     public static String inc(RedisTemplate redisTemplate, String key, long liveTime) {
         RedisAtomicLong entityIdCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());

@@ -10,7 +10,7 @@ public class Player {
     public int score;
     private boolean isReady;
     private String roomId;
-    private boolean isDiaoXian;
+    private boolean isDisConnection;
     private boolean isOp;
 
     public Player(GameWebSocketSession gameWebSocketSession, int score, boolean isReady) {

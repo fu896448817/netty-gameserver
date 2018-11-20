@@ -6,9 +6,9 @@
  */
 package com.linkflywind.gameserver.logicserver.action;
 
+import akka.actor.ActorRef;
 import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.network.websocket.GameWebSocket;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.redisModel.TransferData;
 import com.linkflywind.gameserver.data.monoModel.UserModel;
@@ -17,7 +17,7 @@ import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import com.linkflywind.gameserver.logicserver.protocolData.A1003Request;
 import com.linkflywind.gameserver.logicserver.protocolData.ErrorResponse;
 import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoom;
-import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoomManager;
+import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoomActorManager;
 import com.linkflywind.gameserver.logicserver.protocolData.A1003Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,14 +34,14 @@ public class A1003Action extends BaseAction {
 
 
     @Autowired
-    private final YingSanZhangRoomManager roomManager;
+    private final YingSanZhangRoomActorManager roomActorManager;
     private final UserRepository userRepository;
 
     private final ValueOperations<String, GameWebSocketSession> valueOperationsByPlayer;
 
-    protected A1003Action(RedisTemplate redisTemplate, YingSanZhangRoomManager roomManager, UserRepository userRepository) {
+    protected A1003Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager, UserRepository userRepository) {
         super(redisTemplate);
-        this.roomManager = roomManager;
+        this.roomActorManager = roomActorManager;
         this.valueOperationsByPlayer = redisTemplate.opsForValue();
         this.userRepository = userRepository;
     }
@@ -54,20 +54,18 @@ public class A1003Action extends BaseAction {
         if (userModel.getCardNumber() > 0) {
             YingSanZhangPlayer p = new YingSanZhangPlayer(optionalTransferData.getGameWebSocketSession(), 1000, true);
             p.getGameWebSocketSession().setChannel(Optional.ofNullable(serverName));
-
-            YingSanZhangRoom room = roomManager.createRoom(p,
+            String roomNumber = roomActorManager.createRoomActor(p,
                     a1003Request.getPlayerLowerlimit(),
                     a1003Request.getPlayerUpLimit(),
                     redisTemplate,
                     a1003Request.getXiaZhuTop(),
                     a1003Request.getJuShu());
 
-            p.getGameWebSocketSession().setRoomNumber(Optional.ofNullable(room.getRoomNumber()));
+            p.getGameWebSocketSession().setRoomNumber(Optional.ofNullable(roomNumber));
             this.valueOperationsByPlayer.set(p.getGameWebSocketSession().getName(), p.getGameWebSocketSession());
 
-            send(new A1003Response(room.getRoomNumber()), optionalTransferData, connectorName);
-        }
-        else {
+            send(new A1003Response(roomNumber), optionalTransferData, connectorName);
+        } else {
             send(new ErrorResponse("房卡不足"), optionalTransferData, connectorName);
         }
     }
