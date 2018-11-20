@@ -7,6 +7,8 @@ import akka.actor.Props;
 import akka.routing.RoundRobinPool;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.redisTool.RedisTool;
+import com.linkflywind.gameserver.core.room.Room;
+import com.linkflywind.gameserver.core.room.RoomManager;
 import com.linkflywind.gameserver.data.monoModel.UserModel;
 import com.linkflywind.gameserver.data.monoRepository.UserRepository;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
@@ -25,32 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class YingSanZhangRoomActorManager {
-
-    private String name;
-    private int littleChip;
-    private int intoChip;
-    ConcurrentHashMap<String, ActorRef> map = new ConcurrentHashMap<>();
-
-
-    @Value("${logicserver.hallserver}")
-    protected String connectorName;
-
-    @Value("${logicserver.name}")
-    protected String serverName;
-
-    @Autowired
-    private RedisTemplate redisTemplate;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ActorSystem actorSystem;
-
-    public YingSanZhangRoomActorManager(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-    }
+public class YingSanZhangRoomActorManager extends RoomManager {
 
 
     public String createRoomActor(YingSanZhangPlayer player,
@@ -60,16 +37,20 @@ public class YingSanZhangRoomActorManager {
                                        int xiaZhuTop,
                                        int juShu) {
         String roomNumber = RedisTool.inc(this.redisTemplate, "room", -1);
-        ActorRef actorRef = actorSystem.actorOf(new RoundRobinPool(1).props(Props.create(YingSanZhangRoomActor.class,
+
+        YingSanZhangRoomContext yingSanZhangRoomContext = new YingSanZhangRoomContext(
                 roomNumber,
                 playerUpLimit,
                 playerLowerlimit,
                 redisTemplate,
+                player,
+                serverName,
                 connectorName,
-                xiaZhuTop,
-                juShu,
-                this.serverName,
                 this
+        );
+
+        ActorRef actorRef = actorSystem.actorOf(new RoundRobinPool(1).props(Props.create(Room.class,
+                yingSanZhangRoomContext
                 )));
         map.put(roomNumber, actorRef);
         return roomNumber;

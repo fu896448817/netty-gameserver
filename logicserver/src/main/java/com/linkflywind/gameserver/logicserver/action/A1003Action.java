@@ -6,7 +6,6 @@
  */
 package com.linkflywind.gameserver.logicserver.action;
 
-import akka.actor.ActorRef;
 import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
@@ -16,7 +15,6 @@ import com.linkflywind.gameserver.data.monoRepository.UserRepository;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import com.linkflywind.gameserver.logicserver.protocolData.A1003Request;
 import com.linkflywind.gameserver.logicserver.protocolData.ErrorResponse;
-import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoom;
 import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoomActorManager;
 import com.linkflywind.gameserver.logicserver.protocolData.A1003Response;
 import org.springframework.beans.factory.annotation.Autowired;

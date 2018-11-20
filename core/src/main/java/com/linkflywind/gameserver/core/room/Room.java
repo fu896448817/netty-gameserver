@@ -1,103 +1,98 @@
 package com.linkflywind.gameserver.core.room;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.player.Player;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
-import lombok.Data;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.linkflywind.gameserver.core.room.message.*;
+import com.linkflywind.gameserver.core.room.message.baseMessage.GameInitMessage;
+import com.linkflywind.gameserver.core.room.message.baseMessage.GameRunMessage;
+import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
 
 import java.util.LinkedList;
 import java.util.Optional;
 
-@Data
-public abstract class Room {
-    private String roomNumber;
-    private int playerUpLimit;
-    private int playerLowerlimit;
-    private Player yingSanZhangPoker;
-    private RedisTemplate redisTemplate;
-    private Player master;
-    private boolean isDisbanded;
+public abstract class Room extends RoomStateMachine {
 
-
-    public Room(String roomNumber, int playerLowerlimit, int playerUpLimit, RedisTemplate redisTemplate) {
-        this.roomNumber = roomNumber;
-        this.playerLowerlimit = playerLowerlimit;
-        this.playerUpLimit = playerUpLimit;
-        this.redisTemplate = redisTemplate;
-        this.playerList = new LinkedList<>();
+    protected Room(RoomContext roomContext) {
+        super(roomContext);
     }
 
-    protected LinkedList<? super Player> playerList;
-
-    public void create(Player player) {
-        playerList.add(player);
-    }
-
-    protected boolean join(Player player) {
-        if (this.playerList.size() <= playerUpLimit) {
-            playerList.add(player);
-            if (this.playerList.size() == this.playerLowerlimit) {
-                beginGame();
-            }
-            return true;
+    @Override
+    public State<RoomState, RoomContext> InitEvent(GameInitMessage message, RoomContext roomContext) {
+        if (message instanceof CreateMessage) {
+            roomContext.playerList.add(((CreateMessage) message).getPlayer());
+            roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, ((CreateMessage) message).getPlayer());
+            return stay().using(roomContext);
         }
-        return false;
+        if (message instanceof AppendMessage) {
+
+            Boolean result = roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, ((CreateMessage) message).getPlayer());
+
+            if (result) {
+                return goTo(RoomState.RUN).using(roomContext);
+            }
+        }
+        if (message instanceof ReadyMessage) {
+            Optional<Player> player = getPlayer(((ReadyMessage) message).getName(), roomContext.playerList);
+            if (player.isPresent()) {
+                boolean result = roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, ((CreateMessage) message).getPlayer());
+                if (result) {
+                    return goTo(RoomState.RUN).using(roomContext);
+                }
+            }
+        }
+        return stay().using(roomContext);
     }
 
-    public void exit(Player player) {
-        playerList.remove(player);
+    @Override
+    public State<RoomState, RoomContext> RunEvent(GameRunMessage message, RoomContext roomContext) {
+
+        Boolean result = roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, null);
+        if (result) {
+            return goTo(RoomState.INIT);
+        }
+
+        return stay().using(roomContext);
     }
 
-    public void exit(String name) {
-        playerList.removeIf(p -> ((Player) p).getName().equals(name));
+    @Override
+    public State<RoomState, RoomContext> UnhandledEvent(UnhandledMessage message, RoomContext roomContext) {
+        if (message instanceof ConnectionMessage) {
+            Optional<Player> player = this.getPlayer(((ConnectionMessage) message).getName(), roomContext.getPlayerList());
+            if (player.isPresent()) {
+                Player currentPlayer = player.get();
+                currentPlayer.setDisConnection(false);
+
+
+              roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, currentPlayer);
+            }
+        }
+
+        if (message instanceof DisConnectionMessage) {
+            Optional<Player> player = this.getPlayer(((DisConnectionMessage) message).getName(), roomContext.getPlayerList());
+            if (player.isPresent()) {
+                Player currentPlayer = player.get();
+                currentPlayer.setDisConnection(false);
+                roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, currentPlayer);
+            }
+        }
+
+        if (message instanceof DisbandedMessage) {
+            Optional<Player> player = this.getPlayer(((DisConnectionMessage) message).getName(), roomContext.getPlayerList());
+            if (player.isPresent()) {
+                Player currentPlayer = player.get();
+                currentPlayer.setDisbanded(true);
+                roomContext.getRoomManager().getCacheMap().get(message.getClass()).action(message, roomContext, currentPlayer);
+            }
+        }
+
+        return stay().using(roomContext);
     }
 
-    public abstract void beginGame();
 
-    public Optional<Object> ready(String name) {
-        Optional<Object> player = this.getPlayer(name);
-        player.ifPresent(p -> ((Player) p).setReady(true));
-        return player;
-    }
-
-    public Optional<Object>  disbanded(String name) {
-        Optional<Object> player = this.getPlayer(name);
-        player.ifPresent(p -> ((Player) p).setDisConnection(true));
-        return player;
-    }
-
-    protected Optional<Object> getPlayer(String name) {
-        for (Object player : this.playerList) {
+    protected Optional<Player> getPlayer(String name, LinkedList<? super Player> playerList) {
+        for (Object player : playerList) {
             if (((Player) player).getName().equals(name))
-                return Optional.of(player);
+                return Optional.of(((Player) player));
         }
         return Optional.empty();
     }
-
-    public Optional<Object> disConnection(String name) {
-        Optional<Object> player = this.getPlayer(name);
-        this.getPlayer(name).ifPresent(p -> ((Player) p).setDisConnection(true));
-        return player;
-    }
-
-    public Optional<Object> reConnection(String name) {
-        Optional<Object> player = this.getPlayer(name);
-        this.getPlayer(name).ifPresent(p -> ((Player) p).setDisConnection(false));
-        return player;
-    }
-
-    private byte[] packJson(Object o) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsBytes(o);
-    }
-
-    protected void send(Object o, TransferData transferData, String connector) throws JsonProcessingException {
-        byte[] data = packJson(o);
-        transferData.setData(java.util.Optional.ofNullable(data));
-        this.redisTemplate.convertAndSend(connector, transferData);
-    }
-
 }
-

@@ -7,15 +7,17 @@ import lombok.Data;
 public class Player {
     private GameWebSocketSession gameWebSocketSession;
     private String name;
-    public int score;
+    public int chip;
     private boolean isReady;
     private String roomId;
     private boolean isDisConnection;
+    private boolean isDisbanded;
+
     private boolean isOp;
 
-    public Player(GameWebSocketSession gameWebSocketSession, int score, boolean isReady) {
+    public Player(GameWebSocketSession gameWebSocketSession, int chip, boolean isReady) {
         this.gameWebSocketSession = gameWebSocketSession;
-        this.score = score;
+        this.chip = chip;
         this.isReady = isReady;
     }
 }

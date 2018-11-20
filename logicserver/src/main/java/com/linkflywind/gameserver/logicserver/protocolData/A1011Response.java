@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class A1011Response {
-    private int zhuoMain;
+    private double zhuoMain;
     YingSanZhangPlayer[] players;
 }

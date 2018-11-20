@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BiPaiMessage {
+public class ComparisonMessage {
     private String name;
 }

@@ -32,7 +32,7 @@ public class DispatcherAction {
     public void init() {
         for (String bean : context.getBeanNamesForAnnotation(Protocol.class)) {
             Object o = context.getBean(bean);
-            Protocol protocol = (Protocol) o.getClass().getAnnotations()[0];
+            Protocol protocol = o.getClass().getAnnotation(Protocol.class);
             actionCache.put(protocol.value(), (BaseAction) o);
         }
     }
