@@ -49,7 +49,7 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
     }
 
     @Override
-    public void action(TransferData optionalTransferData) throws IOException {
+    public void requestAction(TransferData optionalTransferData) throws IOException {
         A1004Request a1004Request = unPackJson(optionalTransferData.getData().get(), A1004Request.class);
         ActorRef actorRef = roomActorManager.getRoomActorRef(a1004Request.getRoomId());
 
@@ -58,7 +58,7 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
     }
 
     @Override
-    public boolean action(A1004Request message, YingSanZhangRoomContext context) {
+    public boolean roomAction(A1004Request message, YingSanZhangRoomContext context) {
 
         GameWebSocketSession session = this.valueOperationsByPlayer.get(message.getName());
         YingSanZhangPlayer player = new YingSanZhangPlayer(1000, true, message.getName());

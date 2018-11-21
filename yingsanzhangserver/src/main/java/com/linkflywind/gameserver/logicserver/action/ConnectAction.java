@@ -33,7 +33,7 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
     }
 
     @Override
-    public void action(TransferData optionalTransferData) throws IOException {
+    public void requestAction(TransferData optionalTransferData) throws IOException {
 
 
         String name = optionalTransferData.getGameWebSocketSession().getName();
@@ -48,7 +48,7 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
     }
 
     @Override
-    public boolean action(A1001Request message, YingSanZhangRoomContext context) {
+    public boolean roomAction(A1001Request message, YingSanZhangRoomContext context) {
         try {
 
             Optional<Player> optionalPlayer = context.getPlayer(message.getName());

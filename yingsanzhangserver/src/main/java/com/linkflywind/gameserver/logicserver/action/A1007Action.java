@@ -33,7 +33,7 @@ public class A1007Action extends BaseAction implements RoomAction<A1007Request, 
     }
 
     @Override
-    public void action(TransferData optionalTransferData) throws IOException {
+    public void requestAction(TransferData optionalTransferData) throws IOException {
         A1007Request a1007Request = unPackJson(optionalTransferData.getData().get(), A1007Request.class);
         ActorRef actorRef = roomActorManager.getRoomActorRef(a1007Request.getRoomId());
 
@@ -41,7 +41,7 @@ public class A1007Action extends BaseAction implements RoomAction<A1007Request, 
     }
 
     @Override
-    public boolean action(A1007Request message, YingSanZhangRoomContext context) {
+    public boolean roomAction(A1007Request message, YingSanZhangRoomContext context) {
 
         Player currentPlayer = (Player) context.getPlayerList().element();
         if (currentPlayer.chip >= message.getChip()) {

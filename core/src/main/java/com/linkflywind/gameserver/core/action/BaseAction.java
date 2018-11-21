@@ -38,7 +38,7 @@ public abstract class BaseAction {
      * 请求消息处理
      * @param optionalTransferData 请求报文
      */
-    public abstract void action(TransferData optionalTransferData) throws IOException;
+    public abstract void requestAction(TransferData optionalTransferData) throws IOException;
 
 
     protected <T> T unPackJson(byte[] array, Class<T> tClass) throws IOException {

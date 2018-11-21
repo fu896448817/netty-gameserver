@@ -37,7 +37,7 @@ public class A1009Action extends BaseAction implements RoomAction<A1009Request, 
     }
 
     @Override
-    public void action(TransferData optionalTransferData) throws IOException {
+    public void requestAction(TransferData optionalTransferData) throws IOException {
         A1009Request a1009Request = unPackJson(optionalTransferData.getData().get(), A1009Request.class);
 
 
@@ -47,7 +47,7 @@ public class A1009Action extends BaseAction implements RoomAction<A1009Request, 
     }
 
     @Override
-    public boolean action(A1009Request message, YingSanZhangRoomContext context) {
+    public boolean roomAction(A1009Request message, YingSanZhangRoomContext context) {
 
         Optional<Player> optionalPlayer = context.getPlayer(message.getName());
 

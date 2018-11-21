@@ -49,7 +49,7 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
     }
 
     @Override
-    public void action(TransferData optionalTransferData) throws IOException {
+    public void requestAction(TransferData optionalTransferData) throws IOException {
         A1003Request a1003Request = unPackJson(optionalTransferData.getData().get(), A1003Request.class);
         String name = optionalTransferData.getGameWebSocketSession().getName();
 
@@ -77,7 +77,7 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
     }
 
     @Override
-    public boolean action(A1003Request message, RoomContext context) {
+    public boolean roomAction(A1003Request message, RoomContext context) {
 
 
 

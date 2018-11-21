@@ -30,7 +30,7 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
 
 
     @Override
-    public void action(TransferData optionalTransferData) {
+    public void requestAction(TransferData optionalTransferData) {
         GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(optionalTransferData.getGameWebSocketSession().getName());
 
 
@@ -44,7 +44,7 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
     }
 
     @Override
-    public boolean action(A1002Request message, YingSanZhangRoomContext context) {
+    public boolean roomAction(A1002Request message, YingSanZhangRoomContext context) {
         context.sendAll(new ConnectResponse(message.getName()), 1001);
 
         return false;
