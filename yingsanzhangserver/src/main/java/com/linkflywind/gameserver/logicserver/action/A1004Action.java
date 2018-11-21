@@ -7,39 +7,38 @@
 package com.linkflywind.gameserver.logicserver.action;
 
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.pattern.Patterns;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
+import com.linkflywind.gameserver.core.annotation.RoomActionMapper;
+import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
+import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.redisModel.TransferData;
-import com.linkflywind.gameserver.core.room.message.AppendMessage;
+import com.linkflywind.gameserver.core.room.RoomAction;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
-import com.linkflywind.gameserver.logicserver.protocolData.A1004Request;
-import com.linkflywind.gameserver.logicserver.protocolData.ErrorResponse;
+import com.linkflywind.gameserver.logicserver.protocolData.request.A1004Request;
+import com.linkflywind.gameserver.logicserver.protocolData.response.A1004Response;
+import com.linkflywind.gameserver.logicserver.protocolData.response.ErrorResponse;
 import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoomActorManager;
-import com.linkflywind.gameserver.logicserver.room.message.ResultMessage;
+import com.linkflywind.gameserver.logicserver.room.YingSanZhangRoomContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 @Protocol(1003)
-public class A1004Action extends BaseAction {
-
-    @Autowired
-    ActorSystem actorSystem;
+@RoomActionMapper(A1004Request.class)
+public class A1004Action extends BaseAction implements RoomAction<A1004Request, YingSanZhangRoomContext> {
 
 
     @Autowired
     private final YingSanZhangRoomActorManager roomActorManager;
 
 
-    private final ValueOperations<String, YingSanZhangPlayer> valueOperationsByPlayer;
+    private final ValueOperations<String, GameWebSocketSession> valueOperationsByPlayer;
 
 
     protected A1004Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
@@ -51,12 +50,42 @@ public class A1004Action extends BaseAction {
 
     @Override
     public void action(TransferData optionalTransferData) throws IOException {
-        A1004Request a1003Request = unPackJson(optionalTransferData.getData().get(), A1004Request.class);
-        YingSanZhangPlayer p = new YingSanZhangPlayer(optionalTransferData.getGameWebSocketSession(), 1000, true);
-
-        ActorRef actorRef = roomActorManager.getRoomActorRef(a1003Request.getRoomId());
+        A1004Request a1004Request = unPackJson(optionalTransferData.getData().get(), A1004Request.class);
+        ActorRef actorRef = roomActorManager.getRoomActorRef(a1004Request.getRoomId());
 
 
-        actorRef.tell(new AppendMessage(a1003Request.getRoomId(), p),null);
+        actorRef.tell(a1004Request, null);
+    }
+
+    @Override
+    public boolean action(A1004Request message, YingSanZhangRoomContext context) {
+
+        GameWebSocketSession session = this.valueOperationsByPlayer.get(message.getName());
+        YingSanZhangPlayer player = new YingSanZhangPlayer(1000, true, message.getName());
+        if (context.getPlayerList().size() <= context.getPlayerUpLimit()) {
+            context.getPlayerList().add(player);
+
+
+            session.setRoomNumber(java.util.Optional.ofNullable(context.getRoomNumber()));
+
+            session.setChannel(java.util.Optional.ofNullable(context.getServerName()));
+
+            this.valueOperationsByPlayer.set(player.getName(), session);
+
+            context.sendAll(new A1004Response(context.getPlayerList().toArray(new YingSanZhangPlayer[0]), context.getRoomNumber()), 1004);
+
+            if (context.getPlayerList().size() >= context.getPlayerLowerlimit()) {
+                context.beginGame();
+                return true;
+            }
+        } else {
+
+            try {
+                context.send(new ErrorResponse("房间已满"), new TransferData(session, context.getServerName(), 1003, null));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
     }
 }

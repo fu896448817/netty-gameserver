@@ -1,16 +1,14 @@
-package com.linkflywind.gameserver.core.room.message;
-
+package com.linkflywind.gameserver.logicserver.protocolData.request;
 
 import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public final class DisConnectionMessage extends UnhandledMessage {
+@AllArgsConstructor
+public class A1012Request extends UnhandledMessage {
     private String name;
+    private String roomId;
 }

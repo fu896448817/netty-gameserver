@@ -2,26 +2,17 @@ package com.linkflywind.gameserver.logicserver.room;
 
 
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.routing.RoundRobinPool;
-import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.redisTool.RedisTool;
 import com.linkflywind.gameserver.core.room.Room;
 import com.linkflywind.gameserver.core.room.RoomManager;
-import com.linkflywind.gameserver.data.monoModel.UserModel;
-import com.linkflywind.gameserver.data.monoRepository.UserRepository;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @NoArgsConstructor

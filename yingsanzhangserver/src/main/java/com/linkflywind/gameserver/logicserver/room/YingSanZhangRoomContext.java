@@ -5,8 +5,8 @@ import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.room.RoomContext;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayerState;
-import com.linkflywind.gameserver.logicserver.protocolData.A1005Response;
-import com.linkflywind.gameserver.logicserver.protocolData.A1006Response;
+import com.linkflywind.gameserver.logicserver.protocolData.response.A1005Response;
+import com.linkflywind.gameserver.logicserver.protocolData.response.A1006Response;
 import org.springframework.data.redis.core.RedisTemplate;
 
 

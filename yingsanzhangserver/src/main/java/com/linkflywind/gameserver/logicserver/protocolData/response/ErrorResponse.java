@@ -1,4 +1,4 @@
-package com.linkflywind.gameserver.logicserver.protocolData;
+package com.linkflywind.gameserver.logicserver.protocolData.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

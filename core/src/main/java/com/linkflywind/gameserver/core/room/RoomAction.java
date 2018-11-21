@@ -1,7 +1,12 @@
 package com.linkflywind.gameserver.core.room;
 
-import com.linkflywind.gameserver.core.player.Player;
 
 public interface RoomAction<T,D> {
-    boolean action(T message, D context, Player player);
+    /**
+     * 房间消息处理类
+     * @param message 消息
+     * @param context 当前房间上下文
+     * @return
+     */
+    boolean action(T message, D context);
 }

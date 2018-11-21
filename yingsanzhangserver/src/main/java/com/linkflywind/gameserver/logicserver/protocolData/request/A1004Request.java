@@ -1,16 +1,14 @@
-package com.linkflywind.gameserver.core.room.message;
+package com.linkflywind.gameserver.logicserver.protocolData.request;
 
 import com.linkflywind.gameserver.core.room.message.baseMessage.GameInitMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-
-@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class ReadyMessage extends GameInitMessage {
+@AllArgsConstructor
+public class A1004Request extends GameInitMessage {
     private String name;
+    private String roomId;
 }

@@ -11,10 +11,10 @@ public class YingSanZhangPlayer extends Player implements Comparable<YingSanZhan
     private YingSanZhang yingSanZhang;
     private YingSanZhangPlayerState state;
 
-    public YingSanZhangPlayer(GameWebSocketSession gameWebSocketSession,
-                              int score,
-                              Boolean isReady) {
-        super(gameWebSocketSession, score,isReady);
+    public YingSanZhangPlayer(int score,
+                              Boolean isReady,
+                              String name) {
+        super(score, isReady, name);
         this.setState(YingSanZhangPlayerState.none);
         this.setReady(true);
     }
