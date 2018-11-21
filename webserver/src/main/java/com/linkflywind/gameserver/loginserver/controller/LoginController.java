@@ -31,7 +31,7 @@ public class LoginController {
     }
 
 
-    @GetMapping
+    @GetMapping()
     public Optional<String> login(@RequestBody LoginForm loginForm) {
 
         UserModel userModel =userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword());
@@ -43,8 +43,9 @@ public class LoginController {
         return Optional.empty();
     }
 
-    @GetMapping
-    public Optional<String> visitor(String deviceId){
+    @GetMapping("api/guest")
+    public UserModel guest(String deviceId){
+        String token = JwtTokenUtil.generateToken(deviceId);
         UserModel userModel = new UserModel(deviceId,
                 "",
                 "",
@@ -53,10 +54,14 @@ public class LoginController {
                 "",
                 "",
                 "",
-                1
+                3,
+                ""
+
         );
         userRepository.save(userModel);
-        return Optional.of(JwtTokenUtil.generateToken(userModel.getName()));
+
+        userModel.setToken(token);
+        return userModel;
     }
 
     @GetMapping
@@ -70,7 +75,8 @@ public class LoginController {
                 registerForm.getSponsor(),
                 "",
                 "",
-                3
+                3,
+                ""
                 );
         userRepository.save(userModel);
         return userModel;

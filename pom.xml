@@ -10,9 +10,8 @@
         <module>hallserver</module>
         <module>webserver</module>
         <module>core</module>
-        <module>logicserver</module>
+        <module>yingsanzhangserver</module>
         <module>data</module>
-        <module>GameAlgorithm</module>
         <module>cardlib</module>
     </modules>
     <packaging>pom</packaging>

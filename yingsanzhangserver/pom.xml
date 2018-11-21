@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.linkflywind.gameserver</groupId>
-    <artifactId>logicserver</artifactId>
+    <artifactId>yingsanzhangserver</artifactId>
 
     <dependencies>
         <dependency>

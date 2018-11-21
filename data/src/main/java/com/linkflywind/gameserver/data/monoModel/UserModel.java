@@ -22,4 +22,5 @@ public class UserModel {
     private String eosAddress;
     private String eosPrivateKey;
     private int cardNumber;
+    private String token;
 }
