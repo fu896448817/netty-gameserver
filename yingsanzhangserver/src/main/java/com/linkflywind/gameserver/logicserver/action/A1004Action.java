@@ -62,6 +62,7 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
 
         GameWebSocketSession session = this.valueOperationsByPlayer.get(message.getName());
         YingSanZhangPlayer player = new YingSanZhangPlayer(1000, true, message.getName());
+        player.setGameWebSocketSession(session);
         if (context.getPlayerList().size() <= context.getPlayerUpLimit()) {
             context.getPlayerList().add(player);
 
@@ -70,7 +71,7 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
 
             session.setChannel(java.util.Optional.ofNullable(context.getServerName()));
 
-            this.valueOperationsByPlayer.set(player.getName(), session);
+            this.valueOperationsByPlayer.set(player.getGameWebSocketSession().getName(), session);
 
             context.sendAll(new A1004Response(context.getPlayerList().toArray(new YingSanZhangPlayer[0]), context.getRoomNumber()), 1004);
 

@@ -58,7 +58,8 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
         UserModel userModel = this.userRepository.findByName(name);
 
         if (userModel.getCardNumber() > 0) {
-            YingSanZhangPlayer p = new YingSanZhangPlayer(1000, true,name);
+            YingSanZhangPlayer p = new YingSanZhangPlayer(1000, true, name);
+            p.setGameWebSocketSession(session);
             session.setChannel(Optional.ofNullable(serverName));
             String roomNumber = roomActorManager.createRoomActor(p,
                     a1003Request.getPlayerLowerlimit(),
@@ -78,7 +79,6 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
 
     @Override
     public boolean roomAction(A1003Request message, RoomContext context) {
-
 
 
         return false;

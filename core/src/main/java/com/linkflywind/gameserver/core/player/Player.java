@@ -1,10 +1,11 @@
 package com.linkflywind.gameserver.core.player;
 
+import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import lombok.Data;
 
 @Data
 public class Player {
-    private String name;
+    private GameWebSocketSession gameWebSocketSession;
     public int chip;
     private boolean isReady;
     private String roomId;
@@ -13,9 +14,9 @@ public class Player {
 
     private boolean isOp;
 
-    public Player(int chip, boolean isReady,String name) {
+    public Player(int chip, boolean isReady, GameWebSocketSession gameWebSocketSession) {
         this.chip = chip;
         this.isReady = isReady;
-        this.name = name;
+        this.gameWebSocketSession = gameWebSocketSession;
     }
 }

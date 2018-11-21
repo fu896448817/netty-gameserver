@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @AllArgsConstructor
 @Component
 public class RoomManager {
-    protected ConcurrentHashMap<String, ActorRef> map = new ConcurrentHashMap<>();
-    Map<Class, RoomAction> cacheMap = new HashMap<>();
+    protected ConcurrentHashMap<Integer, ActorRef> map = new ConcurrentHashMap<>();
+    Map<Integer, RoomAction> cacheMap = new HashMap<>();
 
     @Value("${logicserver.hallserver}")
     protected String connectorName;
@@ -56,10 +56,13 @@ public class RoomManager {
 
     @PostConstruct
     public void init() {
-        for (String bean : context.getBeanNamesForAnnotation(RoomActionMapper.class)) {
+        for (String bean : context.getBeanNamesForAnnotation(Protocol.class)) {
             Object o = context.getBean(bean);
-            RoomActionMapper protocol =o.getClass().getAnnotation(RoomActionMapper.class);
-            cacheMap.put(protocol.value(), (RoomAction) o);
+            Protocol protocol = o.getClass().getAnnotation(Protocol.class);
+
+            if(o.getClass().getSuperclass().equals(RoomAction.class)) {
+                cacheMap.put(protocol.value(), (RoomAction) o);
+            }
         }
     }
 }

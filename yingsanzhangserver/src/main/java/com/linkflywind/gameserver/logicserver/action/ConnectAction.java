@@ -36,13 +36,11 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
     public void requestAction(TransferData optionalTransferData) throws IOException {
 
 
-        String name = optionalTransferData.getGameWebSocketSession().getName();
-        GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(optionalTransferData.getGameWebSocketSession().getName());
+        GameWebSocketSession session = optionalTransferData.getGameWebSocketSession();
 
-
-        gameWebSocketSession.getRoomNumber().ifPresent(number -> {
+        session.getRoomNumber().ifPresent(number -> {
                     ActorRef actorRef = roomActorManager.getRoomActorRef(number);
-                    actorRef.tell(new A1001Request(name, number), null);
+                    actorRef.tell(new A1001Request(session, number), null);
                 }
         );
     }
@@ -51,13 +49,13 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
     public boolean roomAction(A1001Request message, YingSanZhangRoomContext context) {
         try {
 
-            Optional<Player> optionalPlayer = context.getPlayer(message.getName());
+            Optional<Player> optionalPlayer = context.getPlayer(message.getSession().getName());
             if (optionalPlayer.isPresent()) {
                 Player player = optionalPlayer.get();
+                player.setGameWebSocketSession(player.getGameWebSocketSession());
                 player.setDisConnection(false);
-                GameWebSocketSession session = this.valueOperationsByGameWebSocketSession.get(message.getName());
                 context.send(new A1011Response(context.deskChip, context.getPlayerList().toArray(new YingSanZhangPlayer[0])),
-                        new TransferData(session,
+                        new TransferData(message.getSession(),
                                 context.getServerName(), 1011, Optional.empty()));
             }
         } catch (JsonProcessingException e) {

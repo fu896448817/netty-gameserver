@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @Protocol(1001)
 public class CloseAction extends BaseAction implements RoomAction<A1002Request, YingSanZhangRoomContext> {
@@ -37,7 +39,7 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
         gameWebSocketSession.getRoomNumber().ifPresent(number -> {
                     ActorRef actorRef = roomActorManager.getRoomActorRef(number);
 
-                    actorRef.tell(new A1002Request(gameWebSocketSession.getName()), null);
+                    actorRef.tell(new A1002Request(gameWebSocketSession.getName(), gameWebSocketSession), null);
 
                 }
         );
@@ -45,7 +47,12 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
 
     @Override
     public boolean roomAction(A1002Request message, YingSanZhangRoomContext context) {
-        context.sendAll(new ConnectResponse(message.getName()), 1001);
+        Optional<Player> p = context.getPlayer(message.getName());
+        p.ifPresent(player -> {
+            player.setDisConnection(true);
+            player.setGameWebSocketSession(message.getSession());
+            context.sendAll(new ConnectResponse(player.getGameWebSocketSession().getName()), 1001);
+        });
 
         return false;
     }

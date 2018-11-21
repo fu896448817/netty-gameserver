@@ -7,6 +7,7 @@
 package com.linkflywind.gameserver.logicserver.protocolData.request;
 
 
+import com.linkflywind.gameserver.core.annotation.Protocol;
 import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Protocol(1009)
 public class A1009Request extends UnhandledMessage {
     String name;
     String roomId;
