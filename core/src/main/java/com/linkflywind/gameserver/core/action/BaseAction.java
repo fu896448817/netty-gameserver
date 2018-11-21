@@ -21,23 +21,13 @@ import java.util.Map;
 
 public abstract class BaseAction {
 
-    @Value("${logicserver.hallserver}")
-    protected String connectorName;
-
-    @Value("${logicserver.name}")
-    protected String serverName;
-
-
-
     protected final   RedisTemplate redisTemplate;
-    protected final  ValueOperations<String,GameWebSocketSession> valueOperationsByGameWebSocketSession;
-    protected final ValueOperations<String,TransferData> valueOperationsByTransferData;
+    protected final ValueOperations<String,GameWebSocketSession> valueOperationsByGameWebSocketSession;
 
     
     protected BaseAction(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
         this.valueOperationsByGameWebSocketSession = redisTemplate.opsForValue();
-        this.valueOperationsByTransferData = redisTemplate.opsForValue();
     }
 
     /**
@@ -58,7 +48,7 @@ public abstract class BaseAction {
     }
 
 
-    protected byte[] packJson(Object o) throws JsonProcessingException {
+    private byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsBytes(o);
     }

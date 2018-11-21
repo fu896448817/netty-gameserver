@@ -18,29 +18,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Component
-public class RoomManager {
-    protected ConcurrentHashMap<Integer, ActorRef> map = new ConcurrentHashMap<>();
+public abstract class RoomManager {
+    protected ConcurrentHashMap<String, ActorRef> map = new ConcurrentHashMap<>();
     Map<Integer, RoomAction> cacheMap = new HashMap<>();
 
-    @Value("${logicserver.hallserver}")
+
     protected String connectorName;
-
-    @Value("${logicserver.name}")
     protected String serverName;
-
-    @Autowired
     protected RedisTemplate redisTemplate;
-
-    @Autowired
     protected ActorSystem actorSystem;
+    protected ApplicationContext context;
 
-    @Autowired
-    protected
-    ApplicationContext context;
 
+    public RoomManager( RedisTemplate redisTemplate, ActorSystem actorSystem, ApplicationContext context) {
+        this.redisTemplate = redisTemplate;
+        this.actorSystem = actorSystem;
+        this.context = context;
+    }
 
     public ActorRef getRoomActorRef(String roomId){
         return map.get(roomId);

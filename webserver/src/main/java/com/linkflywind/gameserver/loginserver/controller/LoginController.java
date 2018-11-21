@@ -13,6 +13,7 @@ import com.linkflywind.gameserver.loginserver.controller.from.LoginForm;
 import com.linkflywind.gameserver.loginserver.controller.from.RegisterForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -27,11 +28,12 @@ public class LoginController {
 
     @Autowired
     public LoginController(UserRepository userRepository) {
+
         this.userRepository = userRepository;
     }
 
 
-    @GetMapping()
+    @PostMapping("api/login")
     public Optional<String> login(@RequestBody LoginForm loginForm) {
 
         UserModel userModel =userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword());
@@ -64,7 +66,7 @@ public class LoginController {
         return userModel;
     }
 
-    @GetMapping
+    @PostMapping("api/register")
     public UserModel register(@RequestBody RegisterForm registerForm){
         //todo 验证码
         UserModel userModel = new UserModel(registerForm.getName(),

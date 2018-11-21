@@ -15,3 +15,7 @@ hall:
     4: baijiale
     5: douniu
   name: hallserver
+netty-websocket:
+  host: 127.0.0.1
+  port: 80
+  path: /

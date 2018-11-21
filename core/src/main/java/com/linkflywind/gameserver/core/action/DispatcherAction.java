@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -13,9 +14,8 @@ import java.util.Optional;
 @Component
 public class DispatcherAction {
 
-    private final
-    ApplicationContext context;
-    private Map<Integer, BaseAction> actionCache;
+    private ApplicationContext context;
+    private Map<Integer, BaseAction> actionCache = new HashMap<>();
 
     @Autowired
     public DispatcherAction(ApplicationContext context) {

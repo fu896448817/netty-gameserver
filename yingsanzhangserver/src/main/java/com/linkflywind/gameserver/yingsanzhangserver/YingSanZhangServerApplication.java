@@ -1,28 +1,22 @@
-package com.linkflywind.gameserver.hallserver;
+package com.linkflywind.gameserver.yingsanzhangserver;
 
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+
 @SpringBootApplication(scanBasePackages =
-        {"com.linkflywind.gameserver.hallserver",
+        {"com.linkflywind.gameserver.yingsanzhangserver",
+                "com.linkflywind.gameserver.data",
                 "com.linkflywind.gameserver.core"
         })
-@Configuration
+@EnableMongoRepositories("com.linkflywind.gameserver.data")
 @EnableAsync
-public class HallServerApplication {
-
-    @Value("${hall.name}")
-    private String serverName;
-
-
+public class YingSanZhangServerApplication {
     public static void main(String[] args) {
-        new SpringApplicationBuilder(HallServerApplication.class)
+        new SpringApplicationBuilder(YingSanZhangServerApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
     }
