@@ -3,8 +3,7 @@ package com.linkflywind.gameserver.core.room;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.player.Player;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
-import lombok.AllArgsConstructor;
+import com.linkflywind.gameserver.core.TransferData;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisTemplate;
 

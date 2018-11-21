@@ -3,9 +3,8 @@ package com.linkflywind.gameserver.logicserver.action;
 import akka.actor.ActorRef;
 import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.annotation.RoomActionMapper;
 import com.linkflywind.gameserver.core.player.Player;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import com.linkflywind.gameserver.core.room.RoomAction;
 import com.linkflywind.gameserver.logicserver.player.YingSanZhangPlayer;
 import com.linkflywind.gameserver.logicserver.protocolData.request.A1007Request;
@@ -20,7 +19,6 @@ import java.io.IOException;
 
 @Component
 @Protocol(1007)
-@RoomActionMapper(A1007Request.class)
 public class A1007Action extends BaseAction implements RoomAction<A1007Request, YingSanZhangRoomContext> {
 
 

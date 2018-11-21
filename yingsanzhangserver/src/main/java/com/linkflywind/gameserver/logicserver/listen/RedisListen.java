@@ -1,7 +1,7 @@
 package com.linkflywind.gameserver.logicserver.listen;
 
 import com.linkflywind.gameserver.core.action.DispatcherAction;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

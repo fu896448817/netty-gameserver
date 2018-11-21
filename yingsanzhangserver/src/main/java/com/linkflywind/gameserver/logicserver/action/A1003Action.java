@@ -8,10 +8,8 @@ package com.linkflywind.gameserver.logicserver.action;
 
 import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.annotation.RoomActionMapper;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
-import com.linkflywind.gameserver.core.player.Player;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import com.linkflywind.gameserver.core.room.RoomAction;
 import com.linkflywind.gameserver.core.room.RoomContext;
 import com.linkflywind.gameserver.data.monoModel.UserModel;
@@ -31,7 +29,6 @@ import java.util.Optional;
 
 @Component
 @Protocol(1003)
-@RoomActionMapper(A1003Request.class)
 public class A1003Action extends BaseAction implements RoomAction<A1003Request, RoomContext> {
 
 

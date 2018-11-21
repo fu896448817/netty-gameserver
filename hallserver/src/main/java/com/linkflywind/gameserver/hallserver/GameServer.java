@@ -4,7 +4,7 @@ package com.linkflywind.gameserver.hallserver;
 import com.linkflywind.gameserver.core.action.DispatcherAction;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocket;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import com.linkflywind.gameserver.hallserver.config.HallConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.yeauty.annotation.ServerEndpoint;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Component

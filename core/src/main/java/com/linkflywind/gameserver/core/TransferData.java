@@ -1,4 +1,4 @@
-package com.linkflywind.gameserver.core.redisModel;
+package com.linkflywind.gameserver.core;
 
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import lombok.AllArgsConstructor;

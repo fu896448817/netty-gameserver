@@ -9,7 +9,7 @@ package com.linkflywind.gameserver.core.action;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -68,9 +68,5 @@ public abstract class BaseAction {
         transferData.setData(java.util.Optional.ofNullable(data));
         this.redisTemplate.convertAndSend(connector, transferData);
     }
-
-//    protected Mono<Long> sendTransferData(TransferData transferData) {
-//        return reactiveRedisOperationsByConnectorData.convertAndSend(connectorName, transferData);
-//    }
 
 }

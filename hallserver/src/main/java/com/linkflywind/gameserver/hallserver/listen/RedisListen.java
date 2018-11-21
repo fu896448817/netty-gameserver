@@ -1,6 +1,6 @@
 package com.linkflywind.gameserver.hallserver.listen;
 
-import com.linkflywind.gameserver.core.redisModel.TransferData;
+import com.linkflywind.gameserver.core.TransferData;
 import com.linkflywind.gameserver.hallserver.GameServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

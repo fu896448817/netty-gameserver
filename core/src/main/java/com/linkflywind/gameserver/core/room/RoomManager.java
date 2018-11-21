@@ -2,9 +2,7 @@ package com.linkflywind.gameserver.core.room;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import com.linkflywind.gameserver.core.action.BaseAction;
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.annotation.RoomActionMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
