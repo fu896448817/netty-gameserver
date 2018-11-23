@@ -14,6 +14,7 @@ public class UserModel {
 
     @Id
     private String name;
+    private String nickName;
     private String password;
     private String mobileNumber;
     private String sex;
@@ -22,5 +23,4 @@ public class UserModel {
     private String eosAddress;
     private String eosPrivateKey;
     private int cardNumber;
-    private String token;
 }

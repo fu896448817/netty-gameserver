@@ -23,7 +23,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.1.0.RELEASE</version>
-        <relativePath/> <!-- lookup parent from com.linkflywind.gameserver.data.monoRepository -->
+        <relativePath/> <!-- lookup parent protocol com.linkflywind.gameserver.data.monoRepository -->
     </parent>
 
     <properties>
@@ -46,6 +46,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

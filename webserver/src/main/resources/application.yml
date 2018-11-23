@@ -7,3 +7,6 @@ spring:
     host: localhoost
     port: 8888
     password: 00
+game:
+  ip: localhost
+  port: 8080
