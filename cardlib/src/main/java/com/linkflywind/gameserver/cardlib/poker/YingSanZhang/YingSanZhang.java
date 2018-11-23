@@ -73,7 +73,7 @@ public class YingSanZhang implements Comparable<YingSanZhang> {
         if (card1.getNumber().ordinal() > card2.getNumber().ordinal())
             return 1;
         else if (card1.getNumber().ordinal() == card2.getNumber().ordinal())
-            return 0;
+            return -1;
         else
             return -1;
     }
@@ -83,7 +83,7 @@ public class YingSanZhang implements Comparable<YingSanZhang> {
         if (this.getDuiNumber().getNumber().ordinal() > o.getDuiNumber().getNumber().ordinal()) {
             return 1;
         } else if (this.getDuiNumber().getNumber().ordinal() == o.getDuiNumber().getNumber().ordinal())
-            return 0;
+            return -1;
         else
             return -1;
     }
@@ -105,7 +105,7 @@ public class YingSanZhang implements Comparable<YingSanZhang> {
 
     private int compareShun(YingSanZhang o) {
         if (this.cards.get(0).getNumber().ordinal() == o.cards.get(0).getNumber().ordinal())
-            return 0;
+            return -1;
         else if (this.cards.get(0).getNumber().ordinal() > o.cards.get(0).getNumber().ordinal())
             return 1;
         else
