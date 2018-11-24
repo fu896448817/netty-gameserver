@@ -30,34 +30,37 @@ public abstract class GameWebSocket {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private static DefaultChannelGroup defaultChannelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    private final AttributeKey<String> channelNameKey = AttributeKey.valueOf("WEBSOCKET_NAME");
+    private final AttributeKey<String> channelNameKey = AttributeKey.valueOf("WEBSOCKET_GAME_ID");
 
-    public GameWebSocket(RedisTemplate redisTemplate) {
+    private final JwtTokenUtil jwtTokenUtil;
+
+    public GameWebSocket(RedisTemplate redisTemplate, JwtTokenUtil jwtTokenUtil) {
         this.redisTemplate = redisTemplate;
         this.valueOperationsByGameWebSocketSession = redisTemplate.opsForValue();
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
 
     @OnOpen
     public void onOpen(Session session, HttpHeaders headers, ParameterMap parameterMap) throws IOException {
-        String name = parameterMap.getParameter("name");
+        String id = parameterMap.getParameter("id");
         String token = parameterMap.getParameter("token");
 
 
-        if (JwtTokenUtil.validateToken(name, token)) {
+        if (jwtTokenUtil.validateToken(id, token)) {
 
             defaultChannelGroup.add(session.channel());
 
             Attribute<String> attributeName = session.channel().attr(channelNameKey);
-            attributeName.set(name);
+            attributeName.set(id);
 
-            GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(name);
+            GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(id);
             if (gameWebSocketSession != null) {
                 gameWebSocketSession.setSessionId(session.id());
                 gameWebSocketSession.setState("0");
-                this.valueOperationsByGameWebSocketSession.set(name, gameWebSocketSession);
+                this.valueOperationsByGameWebSocketSession.set(id, gameWebSocketSession);
             } else {
-                gameWebSocketSession = new GameWebSocketSession(name,
+                gameWebSocketSession = new GameWebSocketSession(id,
                         session.id(),
                         token,
                         Instant.now().toString(),
@@ -66,7 +69,7 @@ public abstract class GameWebSocket {
                         session.remoteAddress().toString(),
                         Optional.empty(),
                         Optional.empty());
-                this.valueOperationsByGameWebSocketSession.set(name, gameWebSocketSession);
+                this.valueOperationsByGameWebSocketSession.set(id, gameWebSocketSession);
             }
             openHandle(gameWebSocketSession);
         } else {

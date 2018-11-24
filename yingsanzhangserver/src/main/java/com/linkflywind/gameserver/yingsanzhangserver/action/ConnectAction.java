@@ -49,7 +49,7 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
     public boolean roomAction(A1001Request message, YingSanZhangRoomContext context) {
         try {
 
-            Optional<Player> optionalPlayer = context.getPlayer(message.getSession().getName());
+            Optional<Player> optionalPlayer = context.getPlayer(message.getSession().getId());
             if (optionalPlayer.isPresent()) {
                 Player player = optionalPlayer.get();
                 player.setGameWebSocketSession(player.getGameWebSocketSession());

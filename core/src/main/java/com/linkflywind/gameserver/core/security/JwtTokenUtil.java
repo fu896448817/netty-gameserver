@@ -3,6 +3,8 @@ package com.linkflywind.gameserver.core.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -10,22 +12,20 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 
+
+@Component
 public class  JwtTokenUtil {
 
-    private static final String CLAIM_KEY_USERNAME = "sub";
-    private static final String CLAIM_KEY_CREATED = "created";
+    private final String CLAIM_KEY_USERNAME = "sub";
+    private final String CLAIM_KEY_CREATED = "created";
 
-    static {
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
-        secret = resourceBundle.getString("jwt.secret");
-        expiration = Long.valueOf(resourceBundle.getString("jwt.expiration"));
-    }
+    @Value("${jwt.secret}")
+    private String secret;
 
+    @Value("${jwt.expiration}")
+    private Long expiration;
 
-    private static String secret;
-    private static Long expiration;
-
-    public static String getUsernameFromToken(String token) {
+    public  String getUsernameFromToken(String token) {
         String username;
         try {
             final Claims claims = getClaimsFromToken(token);
@@ -36,7 +36,7 @@ public class  JwtTokenUtil {
         return username;
     }
 
-    private static Date getCreatedDateFromToken(String token) {
+    private Date getCreatedDateFromToken(String token) {
         Date created;
         try {
             final Claims claims = getClaimsFromToken(token);
@@ -47,7 +47,7 @@ public class  JwtTokenUtil {
         return created;
     }
 
-    private static Date getExpirationDateFromToken(String token) {
+    private Date getExpirationDateFromToken(String token) {
         Date expiration;
         try {
             final Claims claims = getClaimsFromToken(token);
@@ -58,7 +58,7 @@ public class  JwtTokenUtil {
         return expiration;
     }
 
-    private static Claims getClaimsFromToken(String token) {
+    private Claims getClaimsFromToken(String token) {
         Claims claims;
         try {
             claims = Jwts.parser()
@@ -71,27 +71,27 @@ public class  JwtTokenUtil {
         return claims;
     }
 
-    private static Date generateExpirationDate() {
+    private Date generateExpirationDate() {
         return new Date(System.currentTimeMillis() + expiration * 1000);
     }
 
-    private static Boolean isTokenExpired(String token) {
+    private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    private static Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
+    private Boolean isCreatedBeforeLastPasswordReset(Date created, Date lastPasswordReset) {
         return (lastPasswordReset != null && created.before(lastPasswordReset));
     }
 
-    public static String generateToken(String userName) {
+    public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userName);
         claims.put(CLAIM_KEY_CREATED, new Date());
         return generateToken(claims);
     }
 
-    private static String generateToken(Map<String, Object> claims) {
+    private String generateToken(Map<String, Object> claims) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(generateExpirationDate())
@@ -99,13 +99,13 @@ public class  JwtTokenUtil {
                 .compact();
     }
 
-    public static Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
+    public Boolean canTokenBeRefreshed(String token, Date lastPasswordReset) {
         final Date created = getCreatedDateFromToken(token);
         return !isCreatedBeforeLastPasswordReset(created, lastPasswordReset)
                 && !isTokenExpired(token);
     }
 
-    public static String refreshToken(String token) {
+    public String refreshToken(String token) {
         String refreshedToken;
         try {
             final Claims claims = getClaimsFromToken(token);
@@ -117,7 +117,7 @@ public class  JwtTokenUtil {
         return refreshedToken;
     }
 
-    public static Boolean validateToken(String token, String user) {
+    public Boolean validateToken(String token, String user) {
         final String username = getUsernameFromToken(token);
         //final Date created = getCreatedDateFromToken(token);
         //final Date expiration = getExpirationDateFromToken(token);

@@ -34,10 +34,10 @@ public class YingSanZhangRoomContext extends RoomContext {
         for (Object player : this.playerList) {
             ((YingSanZhangPlayer) player).setYingSanZhang(poker.getPocker());
         }
-        YingSanZhangPlayer cuuentPlayer = ((YingSanZhangPlayer) this.playerList.element());
-        cuuentPlayer.setOp(true);
+        YingSanZhangPlayer currentPlayer = ((YingSanZhangPlayer) this.playerList.element());
+        currentPlayer.setOp(true);
         this.playerList.toArray(new YingSanZhangPlayer[0]);
-        sendAll(new A1005Response(this.playerList.toArray(new YingSanZhangPlayer[0]), cuuentPlayer), 1005);
+        sendAll(new A1005Response(this.playerList.toArray(new YingSanZhangPlayer[0]), currentPlayer), 1005);
         this.currentInningsNUmber++;
     }
 

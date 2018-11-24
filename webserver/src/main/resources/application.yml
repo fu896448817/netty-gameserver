@@ -8,5 +8,13 @@ spring:
     port: 8888
     password: 00
 game:
-  ip: localhost
-  port: 8080
+  servers:
+    - ip: localhost
+      port: 8080
+      name: 服务器1
+    - ip: localhost
+      port: 8080
+      name: 服务器2
+jwt:
+  secret: ASDF1234a
+  expiration: 120000

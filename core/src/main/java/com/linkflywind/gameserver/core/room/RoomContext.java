@@ -65,9 +65,9 @@ public class RoomContext {
     }
 
 
-    public Optional<Player> getPlayer(String name) {
+    public Optional<Player> getPlayer(String id) {
         for (Object player : this.playerList) {
-            if (((Player) player).getGameWebSocketSession().getName().equals(name))
+            if (((Player) player).getGameWebSocketSession().getId().equals(id))
                 return Optional.of(((Player) player));
         }
         return Optional.empty();

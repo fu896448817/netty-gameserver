@@ -34,34 +34,35 @@ public class LoginController {
 
     protected final ValueOperations<String, GameWebSocketSession> valueOperationsByGameWebSocketSession;
 
-
     private final RedisTemplate redisTemplate;
+
+    private final JwtTokenUtil jwtTokenUtil;
 
 
     @Autowired
-    public LoginController(UserRepository userRepository, GameConfig config, RedisTemplate redisTemplate) {
-
+    public LoginController(UserRepository userRepository,
+                           GameConfig config,
+                           RedisTemplate redisTemplate,
+                           JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
         this.config = config;
         this.redisTemplate = redisTemplate;
-
+        this.jwtTokenUtil = jwtTokenUtil;
         this.valueOperationsByGameWebSocketSession = this.redisTemplate.opsForValue();
     }
 
 
     @PostMapping("api/login")
     public Optional<LoginResponse> login(@RequestBody LoginRequest loginForm) {
-
         UserModel userModel = userRepository.findByNameAndPassword(loginForm.getName(), loginForm.getPassword());
-
         if (userModel != null) {
-            String token = JwtTokenUtil.generateToken(userModel.getName());
+            String token = jwtTokenUtil.generateToken(userModel.getName());
             LoginResponse loginResponse = new LoginResponse(userModel.getName(),
                     userModel.getNickName(),
                     token,
                     0,
                     0,
-                    config.getGameServerLists()
+                    config.getServers()
             );
 
             return Optional.of(loginResponse);
@@ -71,44 +72,48 @@ public class LoginController {
 
     @GetMapping("api/guest")
     public GuestResponse guest(String deviceId) {
+        String token = jwtTokenUtil.generateToken(deviceId);
+        UserModel userModel = userRepository.findByNameAndUserType(deviceId, 1);
 
-        String token = JwtTokenUtil.generateToken(deviceId);
-        UserModel userModel = new UserModel(deviceId,
-                "访客",
-                "",
-                "",
-                "",
-                0.0,
-                "",
-                "",
-                "",
-                3
 
-        );
-        userRepository.save(userModel);
-        return new GuestResponse(userModel.getName(),
+        if (userModel == null) {
+            userModel = new UserModel();
+            userModel.setName(deviceId);
+            userModel.setNickName("");
+            userModel.setBalance(0);
+            userModel.setCardNumber(3);
+            userModel.setMobileNumber("");
+            userModel.setPassword("");
+            userModel.setSex("0");
+            userModel.setSponsor("");
+            userModel.setUserType(1);
+            userRepository.save(userModel);
+        }
+
+        return new GuestResponse(userModel.getId()
+                ,userModel.getName(),
                 userModel.getNickName(),
                 token,
                 0,
                 3,
-                config.getGameServerLists()
+                config.getServers()
         );
     }
 
     @PostMapping("api/register")
     public UserModel register(@RequestBody RegisterRequest registerForm) {
         //todo 验证码
-        UserModel userModel = new UserModel(registerForm.getName(),
-                registerForm.getNickName(),
-                registerForm.getPassword(),
-                registerForm.getMobileNumber(),
-                registerForm.getSex(),
-                0.0,
-                registerForm.getSponsor(),
-                "",
-                "",
-                3
-        );
+        UserModel userModel = new UserModel();
+
+        userModel.setName( registerForm.getName());
+        userModel.setNickName( registerForm.getNickName());
+        userModel.setBalance(0);
+        userModel.setCardNumber(3);
+        userModel.setMobileNumber( registerForm.getMobileNumber());
+        userModel.setPassword( registerForm.getPassword());
+        userModel.setSex("0");
+        userModel.setSponsor("");
+        userModel.setUserType(0);
         userRepository.save(userModel);
         return userModel;
     }

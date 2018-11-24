@@ -10,13 +10,13 @@ import java.util.List;
 @Component
 @ConfigurationProperties(prefix="game")
 public class GameConfig {
-    private List<GameServerList> gameServerLists = new ArrayList<>();
+    private List<GameServerList> servers = new ArrayList<>();
 
-    public List<GameServerList> getGameServerLists() {
-        return gameServerLists;
+    public List<GameServerList> getServers() {
+        return servers;
     }
 
-    public void setGameServerLists(List<GameServerList> gameServerLists) {
-        this.gameServerLists = gameServerLists;
+    public void setServers(List<GameServerList> servers) {
+        this.servers = servers;
     }
 }

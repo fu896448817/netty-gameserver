@@ -16,7 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class GameWebSocketSession implements Serializable {
     @Id
-    private String name;
+    private String id;
     private ChannelId sessionId;
     private String token;
     private String lastLoginTime;

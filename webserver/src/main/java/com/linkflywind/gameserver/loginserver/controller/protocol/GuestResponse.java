@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GuestResponse {
+    private Long id;
     private String name;
     private String nickName;
     private String token;

@@ -77,7 +77,7 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
 
             session.setChannel(java.util.Optional.ofNullable(context.getServerName()));
 
-            this.valueOperationsByPlayer.set(player.getGameWebSocketSession().getName(), session);
+            this.valueOperationsByPlayer.set(player.getGameWebSocketSession().getId(), session);
 
             context.sendAll(new A1004Response(context.getPlayerList().toArray(new YingSanZhangPlayer[0]), context.getRoomNumber()), 1004);
 

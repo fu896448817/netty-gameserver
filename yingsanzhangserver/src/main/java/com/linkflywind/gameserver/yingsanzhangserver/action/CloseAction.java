@@ -33,13 +33,13 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
 
     @Override
     public void requestAction(TransferData optionalTransferData) {
-        GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(optionalTransferData.getGameWebSocketSession().getName());
+        GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(optionalTransferData.getGameWebSocketSession().getId());
 
 
         gameWebSocketSession.getRoomNumber().ifPresent(number -> {
                     ActorRef actorRef = roomActorManager.getRoomActorRef(number);
 
-                    actorRef.tell(new A1002Request(gameWebSocketSession.getName(), gameWebSocketSession), null);
+                    actorRef.tell(new A1002Request(gameWebSocketSession.getId(), gameWebSocketSession), null);
 
                 }
         );
@@ -51,7 +51,7 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
         p.ifPresent(player -> {
             player.setDisConnection(true);
             player.setGameWebSocketSession(message.getSession());
-            context.sendAll(new ConnectResponse(player.getGameWebSocketSession().getName()), 1001);
+            context.sendAll(new ConnectResponse(player.getGameWebSocketSession().getId()), 1001);
         });
 
         return false;
