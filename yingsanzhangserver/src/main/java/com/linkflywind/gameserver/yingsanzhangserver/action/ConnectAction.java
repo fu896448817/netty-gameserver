@@ -24,13 +24,9 @@ import java.util.Optional;
 @Protocol(1002)
 public class ConnectAction extends BaseAction implements RoomAction<A1001Request, YingSanZhangRoomContext> {
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
     @Autowired
-    public ConnectAction(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
-    }
+    private  YingSanZhangRoomActorManager roomActorManager;
+
 
     @Override
     public void requestAction(TransferData optionalTransferData) {
@@ -38,11 +34,8 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
 
         GameWebSocketSession session = optionalTransferData.getGameWebSocketSession();
 
-        session.getRoomNumber().ifPresent(number -> {
-                    ActorRef actorRef = roomActorManager.getRoomActorRef(number);
-                    actorRef.tell(new A1001Request(session, number), null);
-                }
-        );
+        ActorRef actorRef = roomActorManager.getRoomActorRef( session.getRoomNumber());
+        actorRef.tell(new A1001Request(session,  session.getRoomNumber()), null);
     }
 
     @Override
@@ -56,7 +49,7 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
                 player.setDisConnection(false);
                 context.send(new A1011Response(context.deskChip, context.getPlayerList().toArray(new YingSanZhangPlayer[0])),
                         new TransferData(message.getSession(),
-                                context.getServerName(), 1011, Optional.empty()));
+                                context.getServerName(), 1011, null));
             }
         } catch (JsonProcessingException e) {
             e.printStackTrace();

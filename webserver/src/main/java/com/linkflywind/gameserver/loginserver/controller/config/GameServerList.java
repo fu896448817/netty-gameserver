@@ -11,4 +11,5 @@ public class GameServerList {
     private String ip;
     private String port;
     private String name;
+    private String path;
 }

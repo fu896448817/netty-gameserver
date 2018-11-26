@@ -17,10 +17,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class HallServerApplication {
 
-    @Value("${hall.name}")
-    private String serverName;
-
-
     public static void main(String[] args) {
         new SpringApplicationBuilder(HallServerApplication.class)
                 .web(WebApplicationType.NONE)

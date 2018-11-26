@@ -15,5 +15,5 @@ public class TransferData implements Serializable {
     private GameWebSocketSession gameWebSocketSession;
     private String channel;
     private int protocol;
-    private Optional<byte[]> data;
+    private byte[] data;
 }

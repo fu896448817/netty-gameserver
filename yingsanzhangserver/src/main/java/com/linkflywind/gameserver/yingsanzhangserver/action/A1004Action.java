@@ -28,56 +28,44 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Protocol(1003)
+@Protocol(1004)
 public class A1004Action extends BaseAction implements RoomAction<A1004Request, YingSanZhangRoomContext> {
 
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
-
-    private final ValueOperations<String, GameWebSocketSession> valueOperationsByPlayer;
-
-
     @Autowired
-    protected A1004Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
+    private  YingSanZhangRoomActorManager roomActorManager;
 
-        this.valueOperationsByPlayer = redisTemplate.opsForValue();
-    }
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
 
-        optionalTransferData.getData().ifPresent(data -> {
-                    try {
-                        A1004Request a1004Request = unPackJson(optionalTransferData.getData().get(), A1004Request.class);
-                        ActorRef actorRef = roomActorManager.getRoomActorRef(a1004Request.getRoomId());
+        if(optionalTransferData.getData() != null){
+            try {
+                A1004Request a1004Request = unPackJson(optionalTransferData.getData(), A1004Request.class);
+                ActorRef actorRef = roomActorManager.getRoomActorRef(a1004Request.getRoomId());
 
 
-                        actorRef.tell(a1004Request, null);
-                    } catch (IOException ioException) {
+                actorRef.tell(a1004Request, null);
+            } catch (IOException ioException) {
 
-                    }
-                }
-
-        );
+            }
+        }
     }
 
     @Override
     public boolean roomAction(A1004Request message, YingSanZhangRoomContext context) {
 
-        GameWebSocketSession session = this.valueOperationsByPlayer.get(message.getName());
+        GameWebSocketSession session = this.valueOperationsByGameWebSocketSession.get(message.getName());
         YingSanZhangPlayer player = new YingSanZhangPlayer(1000, true, session);
         if (context.getPlayerList().size() <= context.getPlayerUpLimit()) {
             context.getPlayerList().add(player);
 
 
-            session.setRoomNumber(java.util.Optional.ofNullable(context.getRoomNumber()));
+            session.setRoomNumber(context.getRoomNumber());
 
-            session.setChannel(java.util.Optional.ofNullable(context.getServerName()));
+            session.setChannel(context.getServerName());
 
-            this.valueOperationsByPlayer.set(player.getGameWebSocketSession().getId(), session);
+            this.valueOperationsByGameWebSocketSession.set(player.getGameWebSocketSession().getId(), session);
 
             context.sendAll(new A1004Response(context.getPlayerList().toArray(new YingSanZhangPlayer[0]), context.getRoomNumber()), 1004);
 

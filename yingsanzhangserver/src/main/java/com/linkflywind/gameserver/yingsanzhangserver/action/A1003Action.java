@@ -20,6 +20,8 @@ import com.linkflywind.gameserver.yingsanzhangserver.protocolData.request.A1003R
 import com.linkflywind.gameserver.yingsanzhangserver.protocolData.response.ErrorResponse;
 import com.linkflywind.gameserver.yingsanzhangserver.room.YingSanZhangRoomActorManager;
 import com.linkflywind.gameserver.yingsanzhangserver.protocolData.response.A1003Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -39,25 +41,17 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
     @Value("${logicserver.name}")
     private String serverName;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     @Autowired
     private YingSanZhangRoomActorManager roomActorManager;
-    private final UserRepository userRepository;
-
-    private final ValueOperations<String, GameWebSocketSession> valueOperationsByPlayer;
-
-
     @Autowired
-    public A1003Action(RedisTemplate redisTemplate,
-                       UserRepository userRepository) {
-        super(redisTemplate);
-        this.valueOperationsByPlayer = redisTemplate.opsForValue();
-        this.userRepository = userRepository;
-    }
+    private  UserRepository userRepository;
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
-        A1003Request a1003Request = unPackJson(optionalTransferData.getData().get(), A1003Request.class);
+        A1003Request a1003Request = unPackJson(optionalTransferData.getData(), A1003Request.class);
         String id = optionalTransferData.getGameWebSocketSession().getId();
 
         GameWebSocketSession session = optionalTransferData.getGameWebSocketSession();
@@ -68,7 +62,7 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
             if (userModel.getUserType() > 0) {
                 YingSanZhangPlayer p = new YingSanZhangPlayer(1000, true, session);
                 p.setGameWebSocketSession(session);
-                session.setChannel(Optional.ofNullable(serverName));
+                session.setChannel(serverName);
                 String roomNumber = roomActorManager.createRoomActor(p,
                         a1003Request.getPlayerLowerlimit(),
                         a1003Request.getPlayerUpLimit(),
@@ -76,19 +70,19 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
                         a1003Request.getXiaZhuTop(),
                         a1003Request.getJuShu());
 
-                session.setRoomNumber(Optional.ofNullable(roomNumber));
-                this.valueOperationsByPlayer.set(id, session);
+                session.setRoomNumber(roomNumber);
+                this.valueOperationsByGameWebSocketSession.set(id, session);
 
                 try {
                     send(new A1003Response(roomNumber), optionalTransferData, connectorName);
                 } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                    logger.error("json error:",e);
                 }
             } else {
                 try {
                     send(new ErrorResponse("房卡不足"), optionalTransferData, connectorName);
                 } catch (JsonProcessingException e) {
-                    e.printStackTrace();
+                    logger.error("json error:",e);
                 }
             }
         });

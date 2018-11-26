@@ -1,12 +1,15 @@
+logging:
+  level:
+    root: info
 spring:
   data:
     mongodb:
       host: localhost
       port: 27017
   redis:
-    host: localhoost
-    port: 8888
-    password: 00
+    host: localhost
+    port: 6379
+    password:
 hall:
   routes:
     1: hallserver
@@ -16,6 +19,9 @@ hall:
     5: douniu
   name: hallserver
 netty-websocket:
-  host: 127.0.0.1
-  port: 8080
-  path: /
+  host: localhost
+  port: 8083
+  path: /hall
+jwt:
+  secret: ASDF1234a
+  expiration: 120000

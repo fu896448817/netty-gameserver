@@ -22,27 +22,24 @@ import java.io.IOException;
 public class A1007Action extends BaseAction implements RoomAction<A1007Request, YingSanZhangRoomContext> {
 
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
     @Autowired
-    protected A1007Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
-    }
+    private  YingSanZhangRoomActorManager roomActorManager;
+
 
     @Override
     public void requestAction(TransferData optionalTransferData) {
 
-        optionalTransferData.getData().ifPresent(data -> {
+        if(optionalTransferData.getData() != null)
+        {
             try {
-                A1007Request a1007Request = unPackJson(optionalTransferData.getData().get(), A1007Request.class);
+                A1007Request a1007Request = unPackJson(optionalTransferData.getData(), A1007Request.class);
                 ActorRef actorRef = roomActorManager.getRoomActorRef(a1007Request.getRoomId());
 
                 actorRef.tell(a1007Request, null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        });
+        }
 
     }
 

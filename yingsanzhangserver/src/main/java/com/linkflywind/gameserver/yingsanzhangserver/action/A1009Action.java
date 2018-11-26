@@ -28,17 +28,12 @@ import java.util.Optional;
 @Protocol(1009)
 public class A1009Action extends BaseAction implements RoomAction<A1009Request, YingSanZhangRoomContext> {
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
     @Autowired
-    protected A1009Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
-    }
+    private YingSanZhangRoomActorManager roomActorManager;
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
-        A1009Request a1009Request = unPackJson(optionalTransferData.getData().get(), A1009Request.class);
+        A1009Request a1009Request = unPackJson(optionalTransferData.getData(), A1009Request.class);
 
 
         ActorRef actorRef = roomActorManager.getRoomActorRef(a1009Request.getRoomId());

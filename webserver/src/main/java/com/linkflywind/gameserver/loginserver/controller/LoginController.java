@@ -72,14 +72,13 @@ public class LoginController {
 
     @GetMapping("api/guest")
     public GuestResponse guest(String deviceId) {
-        String token = jwtTokenUtil.generateToken(deviceId);
         UserModel userModel = userRepository.findByNameAndUserType(deviceId, 1);
 
 
         if (userModel == null) {
             userModel = new UserModel();
             userModel.setName(deviceId);
-            userModel.setNickName("");
+            userModel.setNickName("访客");
             userModel.setBalance(0);
             userModel.setCardNumber(3);
             userModel.setMobileNumber("");
@@ -90,6 +89,8 @@ public class LoginController {
             userRepository.save(userModel);
         }
 
+
+        String token = jwtTokenUtil.generateToken(String.valueOf(userModel.getId()));
         return new GuestResponse(userModel.getId()
                 ,userModel.getName(),
                 userModel.getNickName(),

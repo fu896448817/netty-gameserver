@@ -46,7 +46,7 @@ public class RoomContext {
             try {
                 Player player = (Player) playerObject;
                 send(o, new TransferData(player.getGameWebSocketSession(),
-                        this.serverName, protocol, Optional.empty()));
+                        this.serverName, protocol, null));
             } catch (JsonProcessingException e) {
                 e.printStackTrace();
             }
@@ -60,7 +60,7 @@ public class RoomContext {
 
     public void send(Object o, TransferData transferData) throws JsonProcessingException {
         byte[] data = packJson(o);
-        transferData.setData(java.util.Optional.ofNullable(data));
+        transferData.setData(data);
         this.redisTemplate.convertAndSend(this.connectorName, transferData);
     }
 

@@ -24,6 +24,6 @@ public class GameWebSocketSession implements Serializable {
     //0: 登陆 1:退出
     private String state;
     private String address;
-    private Optional<String> channel;
-    private Optional<String> roomNumber;
+    private String channel;
+    private String roomNumber;
 }

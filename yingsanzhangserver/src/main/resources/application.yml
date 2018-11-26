@@ -4,9 +4,12 @@ spring:
       host: localhost
       port: 27017
   redis:
-    host: localhoost
-    port: 8888
-    password: 00
+    host: localhost
+    port: 6379
+    password:
 logicserver:
   name: yingsanzhang
   connector: hallserver
+jwt:
+  secret: ASDF1234a
+  expiration: 120000

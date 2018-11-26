@@ -22,13 +22,8 @@ import java.util.Optional;
 public class CloseAction extends BaseAction implements RoomAction<A1002Request, YingSanZhangRoomContext> {
 
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
     @Autowired
-    public CloseAction(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
-    }
+    private YingSanZhangRoomActorManager roomActorManager;
 
 
     @Override
@@ -36,13 +31,12 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
         GameWebSocketSession gameWebSocketSession = this.valueOperationsByGameWebSocketSession.get(optionalTransferData.getGameWebSocketSession().getId());
 
 
-        gameWebSocketSession.getRoomNumber().ifPresent(number -> {
-                    ActorRef actorRef = roomActorManager.getRoomActorRef(number);
+        if(gameWebSocketSession.getRoomNumber() != null)
+        {
+            ActorRef actorRef = roomActorManager.getRoomActorRef(gameWebSocketSession.getRoomNumber());
 
-                    actorRef.tell(new A1002Request(gameWebSocketSession.getId(), gameWebSocketSession), null);
-
-                }
-        );
+            actorRef.tell(new A1002Request(gameWebSocketSession.getId(), gameWebSocketSession), null);
+        }
     }
 
     @Override

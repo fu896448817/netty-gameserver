@@ -10,11 +10,13 @@ spring:
 game:
   servers:
     - ip: localhost
-      port: 8080
+      port: 8083
       name: 服务器1
+      path: hall
     - ip: localhost
-      port: 8080
+      port: 8083
       name: 服务器2
+      path: hall
 jwt:
   secret: ASDF1234a
   expiration: 120000

@@ -6,7 +6,7 @@ import com.linkflywind.gameserver.core.room.message.baseMessage.GameInitMessage;
 import com.linkflywind.gameserver.core.room.message.baseMessage.GameRunMessage;
 import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
 
-public abstract class Room extends AbstractFSM<RoomState, RoomContext> {
+public class Room extends AbstractFSM<RoomState, RoomContext> {
 
 
     Room(RoomContext roomContext) {

@@ -24,18 +24,15 @@ import java.util.Optional;
 @Protocol(1008)
 public class A1008Action extends BaseAction implements RoomAction<A1008Request, YingSanZhangRoomContext> {
 
-    private final YingSanZhangRoomActorManager roomActorManager;
-
     @Autowired
-    protected A1008Action(RedisTemplate redisTemplate, YingSanZhangRoomActorManager roomActorManager) {
-        super(redisTemplate);
-        this.roomActorManager = roomActorManager;
-    }
+    private YingSanZhangRoomActorManager roomActorManager;
+
+
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
 
-        A1008Request a1008Request = unPackJson(optionalTransferData.getData().get(), A1008Request.class);
+        A1008Request a1008Request = unPackJson(optionalTransferData.getData(), A1008Request.class);
 
         ActorRef actorRef = roomActorManager.getRoomActorRef(a1008Request.getRoomId());
 

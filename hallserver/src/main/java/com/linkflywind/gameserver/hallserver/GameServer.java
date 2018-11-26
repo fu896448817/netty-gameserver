@@ -17,33 +17,21 @@ import org.yeauty.annotation.ServerEndpoint;
 import java.util.Optional;
 
 @Component
-@ServerEndpoint
+@ServerEndpoint(prefix = "netty-websocket")
 public class GameServer extends GameWebSocket {
 
-    private final DispatcherAction dispatcherAction;
+    @Autowired
+    private  DispatcherAction dispatcherAction;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final HallConfig hallConfig;
-
-    private final RedisTemplate redisTemplate;
-    private final JwtTokenUtil jwtTokenUtil;
-
-
     @Autowired
-    public GameServer(DispatcherAction dispatcherAction,
-                      HallConfig hallConfig,
-                      RedisTemplate redisTemplate,JwtTokenUtil jwtTokenUtil) {
-        super(redisTemplate, jwtTokenUtil);
-        this.dispatcherAction = dispatcherAction;
-        this.hallConfig = hallConfig;
-        this.redisTemplate = redisTemplate;
-        this.jwtTokenUtil = jwtTokenUtil;
-    }
+    private  HallConfig hallConfig;
 
     @Override
-    protected boolean receiveHandle(GameWebSocketSession session, int channel, int protocol, Optional<byte[]> buffer) {
+    protected boolean receiveHandle(GameWebSocketSession session, int channel, int protocol, byte[] buffer) {
 
+        
         String channelString = hallConfig.getRoutes().get(String.valueOf(channel));
         if (channelString.equals(hallConfig.getName())) {
             dispatcherAction.createAction(protocol);
@@ -55,15 +43,17 @@ public class GameServer extends GameWebSocket {
 
     @Override
     protected void openHandle(GameWebSocketSession session) {
-        session.getChannel().ifPresent(p ->
-                this.redisTemplate.convertAndSend(p, new TransferData(session, "", 1001, Optional.empty()))
-        );
+
+        if(session.getChannel() != null && !session.getChannel().isEmpty())
+        {
+            this.redisTemplate.convertAndSend(session.getChannel(), new TransferData(session, "", 1001, null));
+        }
     }
 
     @Override
     protected void closeHandle(GameWebSocketSession session) {
-        session.getChannel().ifPresent(p ->
-                this.redisTemplate.convertAndSend(p, new TransferData(session, "", 1002, Optional.empty()))
-        );
+        if(session.getChannel() != null && !session.getChannel().isEmpty()){
+            this.redisTemplate.convertAndSend(session.getChannel(), new TransferData(session, "", 1002, null));
+        }
     }
 }

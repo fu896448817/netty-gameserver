@@ -14,13 +14,10 @@ import java.util.Optional;
 @Component
 public class DispatcherAction {
 
+    @Autowired
     private ApplicationContext context;
     private Map<Integer, BaseAction> actionCache = new HashMap<>();
 
-    @Autowired
-    public DispatcherAction(ApplicationContext context) {
-        this.context = context;
-    }
 
     public Optional<BaseAction> createAction(int protocol) {
         if (actionCache != null)

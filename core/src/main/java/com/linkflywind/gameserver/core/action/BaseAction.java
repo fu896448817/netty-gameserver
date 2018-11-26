@@ -10,9 +10,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.TransferData;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,14 +22,15 @@ import java.util.Map;
 
 public abstract class BaseAction {
 
-    protected final   RedisTemplate redisTemplate;
-    protected final ValueOperations<String,GameWebSocketSession> valueOperationsByGameWebSocketSession;
+    @Autowired
+    protected  RedisTemplate redisTemplate;
+    protected  ValueOperations<String,GameWebSocketSession> valueOperationsByGameWebSocketSession;
 
-    
-    protected BaseAction(RedisTemplate redisTemplate) {
-        this.redisTemplate = redisTemplate;
-        this.valueOperationsByGameWebSocketSession = redisTemplate.opsForValue();
+    @PostConstruct
+    protected void init(){
+        this.valueOperationsByGameWebSocketSession = this.redisTemplate.opsForValue();
     }
+
 
     /**
      * 请求消息处理
@@ -54,7 +57,7 @@ public abstract class BaseAction {
 
     protected void send(Object o,TransferData transferData,String connector) throws JsonProcessingException {
         byte[] data = packJson(o);
-        transferData.setData(java.util.Optional.ofNullable(data));
+        transferData.setData(data);
         this.redisTemplate.convertAndSend(connector, transferData);
     }
 
