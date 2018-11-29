@@ -67,7 +67,7 @@ public class YingSanZhangRoomActorManager extends RoomManager {
     }
 
     public ActorRef getRoomActorRef(String roomId) {
-        return map.get(roomId);
+        return map.getOrDefault(roomId,null);
     }
 
     public void clearRoom(String roomId) {

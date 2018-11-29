@@ -30,8 +30,6 @@ public class GameServer extends GameWebSocket {
 
     @Override
     protected boolean receiveHandle(GameWebSocketSession session, int channel, int protocol, byte[] buffer) {
-
-        
         String channelString = hallConfig.getRoutes().get(String.valueOf(channel));
         if (channelString.equals(hallConfig.getName())) {
             dispatcherAction.createAction(protocol);

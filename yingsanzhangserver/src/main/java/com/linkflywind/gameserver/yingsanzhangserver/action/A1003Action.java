@@ -47,7 +47,7 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
     @Autowired
     private YingSanZhangRoomActorManager roomActorManager;
     @Autowired
-    private  UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
@@ -58,34 +58,39 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
 
         Optional<UserModel> optionalUserModel = this.userRepository.findById(Long.valueOf(id));
 
-        optionalUserModel.ifPresent(userModel->{
-            if (userModel.getUserType() > 0) {
-                YingSanZhangPlayer p = new YingSanZhangPlayer(1000, true, session);
-                p.setGameWebSocketSession(session);
-                session.setChannel(serverName);
-                String roomNumber = roomActorManager.createRoomActor(p,
-                        a1003Request.getPlayerLowerlimit(),
-                        a1003Request.getPlayerUpLimit(),
-                        redisTemplate,
-                        a1003Request.getXiaZhuTop(),
-                        a1003Request.getJuShu());
 
-                session.setRoomNumber(roomNumber);
-                this.valueOperationsByGameWebSocketSession.set(id, session);
+        if (session.getRoomNumber() == null || session.getRoomNumber().isEmpty()) {
+            optionalUserModel.ifPresent(userModel -> {
+                if (userModel.getUserType() > 0) {
+                    YingSanZhangPlayer p = new YingSanZhangPlayer(1000, true, session);
+                    p.setGameWebSocketSession(session);
+                    session.setChannel(serverName);
+                    String roomNumber = roomActorManager.createRoomActor(p,
+                            a1003Request.getPlayerLowerlimit(),
+                            a1003Request.getPlayerUpLimit(),
+                            redisTemplate,
+                            a1003Request.getXiaZhuTop(),
+                            a1003Request.getJuShu());
 
-                try {
-                    send(new A1003Response(roomNumber), optionalTransferData, connectorName);
-                } catch (JsonProcessingException e) {
-                    logger.error("json error:",e);
+                    session.setRoomNumber(roomNumber);
+                    this.valueOperationsByGameWebSocketSession.set(id, session);
+
+                    try {
+                        send(new A1003Response(roomNumber), optionalTransferData, connectorName);
+                    } catch (JsonProcessingException e) {
+                        logger.error("json error:", e);
+                    }
+                } else {
+                    try {
+                        send(new ErrorResponse("房卡不足"), optionalTransferData, connectorName);
+                    } catch (JsonProcessingException e) {
+                        logger.error("json error:", e);
+                    }
                 }
-            } else {
-                try {
-                    send(new ErrorResponse("房卡不足"), optionalTransferData, connectorName);
-                } catch (JsonProcessingException e) {
-                    logger.error("json error:",e);
-                }
-            }
-        });
+            });
+        } else {
+            send(new A1003Response(session.getRoomNumber()), optionalTransferData, connectorName);
+        }
     }
 
     @Override

@@ -8,18 +8,16 @@ package com.linkflywind.gameserver.yingsanzhangserver.protocolData.request;
 
 
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
+import com.linkflywind.gameserver.core.room.message.baseMessage.RoomMessage;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Protocol(1009)
-public class A1009Request extends UnhandledMessage {
+public class A1009Request implements RoomMessage {
     String name;
     String roomId;
 }

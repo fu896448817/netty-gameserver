@@ -33,6 +33,7 @@ public class RedisListenTask {
 
         dispatcherAction.createAction(transferData.getProtocol()).ifPresent(p-> {
             try {
+                logger.info("run action :" + transferData.getProtocol());
                 p.requestAction(transferData);
             } catch (IOException e) {
                 logger.error("action error",e);

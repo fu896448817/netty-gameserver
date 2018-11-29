@@ -1,52 +1,23 @@
 package com.linkflywind.gameserver.core.room;
 
-import akka.actor.AbstractFSM;
+import akka.actor.AbstractActor;
 import com.linkflywind.gameserver.core.annotation.Protocol;
-import com.linkflywind.gameserver.core.room.message.baseMessage.GameInitMessage;
-import com.linkflywind.gameserver.core.room.message.baseMessage.GameRunMessage;
-import com.linkflywind.gameserver.core.room.message.baseMessage.UnhandledMessage;
+import com.linkflywind.gameserver.core.room.message.baseMessage.RoomMessage;
 
-public class Room extends AbstractFSM<RoomState, RoomContext> {
+public class Room extends AbstractActor {
 
+    private RoomContext roomContext;
 
     Room(RoomContext roomContext) {
-        startWith(RoomState.INIT, roomContext);
-
-        when(RoomState.INIT, matchEvent(GameInitMessage.class, RoomContext.class, this::InitEvent));
-
-        when(RoomState.RUN, matchEvent(GameRunMessage.class, RoomContext.class, this::RunEvent));
-
-        whenUnhandled(
-                matchEvent(UnhandledMessage.class,
-                        this::UnhandledEvent));
+        this.roomContext = roomContext;
     }
 
-    public State<RoomState, RoomContext> InitEvent(GameInitMessage message, RoomContext roomContext) {
 
-        Integer protocol = message.getClass().getAnnotation(Protocol.class).value();
-
-        if (roomContext.getRoomManager().getCacheMap().get(protocol).roomAction(message, roomContext)) {
-            return goTo(RoomState.RUN).using(roomContext);
-        }
-        return stay().using(roomContext);
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder().match(RoomMessage.class, message -> {
+            Integer protocol = message.getClass().getAnnotation(Protocol.class).value();
+            roomContext.getRoomManager().getCacheMap().get(protocol).roomAction(message, roomContext);
+        }).build();
     }
-
-    public State<RoomState, RoomContext> RunEvent(GameRunMessage message, RoomContext roomContext) {
-
-        Integer protocol = message.getClass().getAnnotation(Protocol.class).value();
-
-        if (roomContext.getRoomManager().getCacheMap().get(protocol).roomAction(message, roomContext)) {
-            return goTo(RoomState.INIT);
-        }
-
-        return stay().using(roomContext);
-    }
-
-    public State<RoomState, RoomContext> UnhandledEvent(UnhandledMessage message, RoomContext roomContext) {
-
-        Integer protocol = message.getClass().getAnnotation(Protocol.class).value();
-        roomContext.getRoomManager().getCacheMap().get(protocol).roomAction(message, roomContext);
-        return stay().using(roomContext);
-    }
-
 }

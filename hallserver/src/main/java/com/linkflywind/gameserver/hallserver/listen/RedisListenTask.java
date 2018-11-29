@@ -13,11 +13,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 public class RedisListenTask {
 
@@ -28,7 +23,6 @@ public class RedisListenTask {
 
     @Autowired
     private HallConfig hallConfig;
-
 
     @Async
     public void doMessageTask(Message message, byte[] bytes) {
