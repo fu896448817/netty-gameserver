@@ -22,6 +22,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class YingSanZhangRoomActorManager extends RoomManager {
 
+    @Autowired
+    private ApplicationContext context;
+
 
     @Value("${logicserver.connector}")
     private String logicserverConnector;
@@ -48,16 +51,14 @@ public class YingSanZhangRoomActorManager extends RoomManager {
                                   int juShu) {
         String roomNumber = RedisTool.inc(this.redisTemplate, "room", -1);
 
-        YingSanZhangRoomContext yingSanZhangRoomContext = new YingSanZhangRoomContext(
-                roomNumber,
+        YingSanZhangRoomContext yingSanZhangRoomContext = (YingSanZhangRoomContext) context.getBean("YingSanZhangRoomContext",roomNumber,
                 playerUpLimit,
                 playerLowerlimit,
                 redisTemplate,
                 player,
                 serverName,
                 connectorName,
-                this
-        );
+                this);
 
         ActorRef actorRef = actorSystem.actorOf(new RoundRobinPool(1).props(Props.create(Room.class,
                 yingSanZhangRoomContext

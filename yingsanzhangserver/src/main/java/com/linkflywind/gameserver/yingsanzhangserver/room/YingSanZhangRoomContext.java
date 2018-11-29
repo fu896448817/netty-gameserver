@@ -7,13 +7,21 @@ import com.linkflywind.gameserver.yingsanzhangserver.player.YingSanZhangPlayer;
 import com.linkflywind.gameserver.yingsanzhangserver.player.YingSanZhangPlayerState;
 import com.linkflywind.gameserver.yingsanzhangserver.protocolData.response.A1005Response;
 import com.linkflywind.gameserver.yingsanzhangserver.protocolData.response.A1006Response;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 
 
+@Component
+@Scope(value = "prototype")
+@NoArgsConstructor
 public class YingSanZhangRoomContext extends RoomContext {
 
     public double deskChip;
     private YingSanZhangPoker poker = new YingSanZhangPoker();
+
 
     YingSanZhangRoomContext(
             String roomNumber,
@@ -61,6 +69,5 @@ public class YingSanZhangRoomContext extends RoomContext {
                 break;
             }
         }
-
     }
 }

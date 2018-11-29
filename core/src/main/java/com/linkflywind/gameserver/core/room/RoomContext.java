@@ -5,13 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.TransferData;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.util.LinkedList;
 import java.util.Optional;
 
 @Data
-public class RoomContext {
+@Component
+@Scope(value = "prototype")
+@NoArgsConstructor
+public abstract class RoomContext {
     protected String roomNumber;
     protected int playerUpLimit;
     protected int playerLowerlimit;
@@ -22,13 +30,17 @@ public class RoomContext {
     protected int currentInningsNUmber;
     protected String serverName;
     protected String connectorName;
-    protected LinkedList<? super Player> playerList;
+    protected volatile LinkedList<? super Player> playerList;
     protected RoomManager roomManager;
 
 
-    public RoomContext(String roomNumber, int playerUpLimit,
-                       int playerLowerlimit, RedisTemplate redisTemplate, Player master,
-                       String serverName, String connectorName,
+    public RoomContext(String roomNumber,
+                       int playerUpLimit,
+                       int playerLowerlimit,
+                       RedisTemplate redisTemplate,
+                       Player master,
+                       String serverName,
+                       String connectorName,
                        RoomManager roomManager) {
         this.roomNumber = roomNumber;
         this.playerUpLimit = playerUpLimit;
@@ -58,6 +70,8 @@ public class RoomContext {
         return objectMapper.writeValueAsBytes(o);
     }
 
+
+    @Async
     public void send(Object o, TransferData transferData) throws JsonProcessingException {
         byte[] data = packJson(o);
         transferData.setData(data);

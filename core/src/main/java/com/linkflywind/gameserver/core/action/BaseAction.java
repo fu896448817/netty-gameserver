@@ -10,9 +10,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linkflywind.gameserver.core.network.websocket.GameWebSocketSession;
 import com.linkflywind.gameserver.core.TransferData;
+import com.linkflywind.gameserver.core.room.RoomContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.scheduling.annotation.Async;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -49,16 +51,20 @@ public abstract class BaseAction {
         return objectMapper.readValue(array, new HashMap<String, String>().getClass());
     }
 
-
     private byte[] packJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.writeValueAsBytes(o);
     }
 
+
+    @Async
     protected void send(Object o,TransferData transferData,String connector) throws JsonProcessingException {
         byte[] data = packJson(o);
         transferData.setData(data);
         this.redisTemplate.convertAndSend(connector, transferData);
     }
+
+
+
 
 }
