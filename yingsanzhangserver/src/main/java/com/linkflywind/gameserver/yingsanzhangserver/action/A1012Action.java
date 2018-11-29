@@ -43,12 +43,11 @@ public class A1012Action extends BaseAction implements RoomAction<A1012Request, 
     }
 
     @Override
-    public boolean roomAction(A1012Request message, YingSanZhangRoomContext context) {
+    public void roomAction(A1012Request message, YingSanZhangRoomContext context) {
         context.sendAll(new A1012Response(message.getName(), context.getRoomNumber()), 1012);
         int person = context.getPlayerList().size() / 2;
         if (context.getPlayerList().stream().filter(p -> ((Player) p).isDisbanded()).count() >= person) {
             context.clearRoom();
         }
-        return false;
     }
 }

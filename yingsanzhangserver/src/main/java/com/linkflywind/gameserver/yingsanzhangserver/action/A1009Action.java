@@ -42,7 +42,7 @@ public class A1009Action extends BaseAction implements RoomAction<A1009Request, 
     }
 
     @Override
-    public boolean roomAction(A1009Request message, YingSanZhangRoomContext context) {
+    public void roomAction(A1009Request message, YingSanZhangRoomContext context) {
 
         Optional<Player> optionalPlayer = context.getPlayer(message.getName());
 
@@ -53,9 +53,7 @@ public class A1009Action extends BaseAction implements RoomAction<A1009Request, 
             context.sendAll(new A1009Response(player), 1009);
             if (context.getPlayerList().stream().anyMatch(p -> ((Player) p).isReady())) {
                 context.beginGame();
-                return true;
             }
         }
-        return false;
     }
 }

@@ -8,5 +8,5 @@ public interface RoomAction<T,D> {
      * @param context 当前房间上下文
      * @return
      */
-    boolean roomAction(T message, D context);
+    void roomAction(T message, D context);
 }

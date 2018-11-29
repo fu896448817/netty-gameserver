@@ -44,7 +44,7 @@ public class A1007Action extends BaseAction implements RoomAction<A1007Request, 
     }
 
     @Override
-    public boolean roomAction(A1007Request message, YingSanZhangRoomContext context) {
+    public void roomAction(A1007Request message, YingSanZhangRoomContext context) {
 
         Player currentPlayer = (Player) context.getPlayerList().element();
         if (currentPlayer.chip >= message.getChip()) {
@@ -54,6 +54,5 @@ public class A1007Action extends BaseAction implements RoomAction<A1007Request, 
             context.next();
         }
         context.getPlayerList().poll();
-        return false;
     }
 }

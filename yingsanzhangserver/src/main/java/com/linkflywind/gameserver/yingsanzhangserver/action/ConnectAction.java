@@ -25,7 +25,7 @@ import java.util.Optional;
 public class ConnectAction extends BaseAction implements RoomAction<A1001Request, YingSanZhangRoomContext> {
 
     @Autowired
-    private  YingSanZhangRoomActorManager roomActorManager;
+    private YingSanZhangRoomActorManager roomActorManager;
 
 
     @Override
@@ -34,26 +34,21 @@ public class ConnectAction extends BaseAction implements RoomAction<A1001Request
 
         GameWebSocketSession session = optionalTransferData.getGameWebSocketSession();
 
-        ActorRef actorRef = roomActorManager.getRoomActorRef( session.getRoomNumber());
-        actorRef.tell(new A1001Request(session,  session.getRoomNumber()), null);
+        ActorRef actorRef = roomActorManager.getRoomActorRef(session.getRoomNumber());
+        actorRef.tell(new A1001Request(session, session.getRoomNumber()), null);
     }
 
     @Override
-    public boolean roomAction(A1001Request message, YingSanZhangRoomContext context) {
-        try {
+    public void roomAction(A1001Request message, YingSanZhangRoomContext context) {
 
-            Optional<Player> optionalPlayer = context.getPlayer(message.getSession().getId());
-            if (optionalPlayer.isPresent()) {
-                Player player = optionalPlayer.get();
-                player.setGameWebSocketSession(player.getGameWebSocketSession());
-                player.setDisConnection(false);
-                context.send(new A1011Response(context.deskChip, context.getPlayerList().toArray(new YingSanZhangPlayer[0])),
-                        new TransferData(message.getSession(),
-                                context.getServerName(), 1011, null));
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        Optional<Player> optionalPlayer = context.getPlayer(message.getSession().getId());
+        if (optionalPlayer.isPresent()) {
+            Player player = optionalPlayer.get();
+            player.setGameWebSocketSession(player.getGameWebSocketSession());
+            player.setDisConnection(false);
+            context.send(new A1011Response(context.deskChip, context.getPlayerList().toArray(new YingSanZhangPlayer[0])),
+                    new TransferData(message.getSession(),
+                            context.getServerName(), 1011, null));
         }
-        return false;
     }
 }

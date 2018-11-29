@@ -6,6 +6,8 @@ import com.linkflywind.gameserver.core.player.Player;
 import com.linkflywind.gameserver.core.TransferData;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -33,6 +35,8 @@ public abstract class RoomContext {
     protected volatile LinkedList<? super Player> playerList;
     protected RoomManager roomManager;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 
     public RoomContext(String roomNumber,
                        int playerUpLimit,
@@ -55,13 +59,9 @@ public abstract class RoomContext {
 
     public void sendAll(Object o, int protocol) {
         for (Object playerObject : this.playerList) {
-            try {
                 Player player = (Player) playerObject;
                 send(o, new TransferData(player.getGameWebSocketSession(),
                         this.serverName, protocol, null));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -72,10 +72,14 @@ public abstract class RoomContext {
 
 
     @Async
-    public void send(Object o, TransferData transferData) throws JsonProcessingException {
-        byte[] data = packJson(o);
-        transferData.setData(data);
-        this.redisTemplate.convertAndSend(this.connectorName, transferData);
+    public void send(Object o, TransferData transferData) {
+        try {
+            byte[] data = packJson(o);
+            transferData.setData(data);
+            this.redisTemplate.convertAndSend(this.connectorName, transferData);
+        } catch (JsonProcessingException e) {
+            logger.error("JsonProcessingException ",e);
+        }
     }
 
 

@@ -40,14 +40,12 @@ public class CloseAction extends BaseAction implements RoomAction<A1002Request, 
     }
 
     @Override
-    public boolean roomAction(A1002Request message, YingSanZhangRoomContext context) {
+    public void roomAction(A1002Request message, YingSanZhangRoomContext context) {
         Optional<Player> p = context.getPlayer(message.getName());
         p.ifPresent(player -> {
             player.setDisConnection(true);
             player.setGameWebSocketSession(message.getSession());
             context.sendAll(new ConnectResponse(player.getGameWebSocketSession().getId()), 1001);
         });
-
-        return false;
     }
 }

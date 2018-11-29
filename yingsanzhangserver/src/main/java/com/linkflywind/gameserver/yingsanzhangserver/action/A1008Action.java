@@ -40,7 +40,7 @@ public class A1008Action extends BaseAction implements RoomAction<A1008Request, 
     }
 
     @Override
-    public boolean roomAction(A1008Request message, YingSanZhangRoomContext context) {
+    public void roomAction(A1008Request message, YingSanZhangRoomContext context) {
         YingSanZhangPlayer yingSanZhangPlayer = (YingSanZhangPlayer) context.getPlayerList().element();
         Optional<Player> optionalPlayer = context.getPlayer(message.getToName());
         optionalPlayer.ifPresent(p -> {
@@ -57,6 +57,5 @@ public class A1008Action extends BaseAction implements RoomAction<A1008Request, 
             context.getPlayerList().poll();
             context.next();
         });
-        return false;
     }
 }

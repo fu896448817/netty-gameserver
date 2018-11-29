@@ -33,18 +33,16 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
 
 
     @Autowired
-    private  YingSanZhangRoomActorManager roomActorManager;
+    private YingSanZhangRoomActorManager roomActorManager;
 
 
     @Override
     public void requestAction(TransferData optionalTransferData) throws IOException {
 
-        if(optionalTransferData.getData() != null){
+        if (optionalTransferData.getData() != null) {
             try {
                 A1004Request a1004Request = unPackJson(optionalTransferData.getData(), A1004Request.class);
                 ActorRef actorRef = roomActorManager.getRoomActorRef(a1004Request.getRoomId());
-
-
                 actorRef.tell(a1004Request, null);
             } catch (IOException ioException) {
 
@@ -53,16 +51,12 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
     }
 
     @Override
-    public boolean roomAction(A1004Request message, YingSanZhangRoomContext context) {
-
+    public void roomAction(A1004Request message, YingSanZhangRoomContext context) {
         GameWebSocketSession session = this.valueOperationsByGameWebSocketSession.get(message.getName());
         YingSanZhangPlayer player = new YingSanZhangPlayer(1000, true, session);
         if (context.getPlayerList().size() <= context.getPlayerUpLimit()) {
             context.getPlayerList().add(player);
-
-
             session.setRoomNumber(context.getRoomNumber());
-
             session.setChannel(context.getServerName());
 
             this.valueOperationsByGameWebSocketSession.set(player.getGameWebSocketSession().getId(), session);
@@ -71,16 +65,9 @@ public class A1004Action extends BaseAction implements RoomAction<A1004Request, 
 
             if (context.getPlayerList().size() >= context.getPlayerLowerlimit()) {
                 context.beginGame();
-                return true;
             }
         } else {
-
-            try {
-                context.send(new ErrorResponse("房间已满"), new TransferData(session, context.getServerName(), 1003, null));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+            context.send(new ErrorResponse("房间已满"), new TransferData(session, context.getServerName(), 1003, null));
         }
-        return false;
     }
 }

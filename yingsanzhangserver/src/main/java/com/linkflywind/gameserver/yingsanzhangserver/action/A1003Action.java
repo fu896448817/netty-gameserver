@@ -92,9 +92,7 @@ public class A1003Action extends BaseAction implements RoomAction<A1003Request, 
     }
 
     @Override
-    public boolean roomAction(A1003Request message, RoomContext context) {
+    public void roomAction(A1003Request message, RoomContext context) {
 
-
-        return false;
     }
 }
