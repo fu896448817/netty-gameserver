@@ -1,13 +1,13 @@
 package com.linkflywind.gameserver.hallserver.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Configuration
 @ConfigurationProperties(prefix = "hall")
 public class HallConfig {
 
